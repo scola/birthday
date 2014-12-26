@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <string name="app_name">CriminalIntent</string>
+  <string name="app_name">Birthday</string>
   <string name="crime_title_hint">Enter a title for this crime.</string>
   <string name="crime_title_label">Title</string> 
+  
+    <string name="title_name_preference">Name</string>
+    <string name="summary_name_preference">Whose birthday</string>    
+    <string name="dialog_title_name_preference">Input the name</string>    
+    <string name="title_remind_time_preference">Remind time</string>
+    <string name="dialog_title_remind_time_preference">Set remind time</string>    
+    <string name="summary_time_preference">12:00</string>
+    
+    <string name="title_date_preference">Birthday</string>
+    <string name="summary_date_preference">06-08</string>
+    <string name="dialog_title_date_preference">Set birthday</string>
+    
+    <string name="title_lunar_preference">Lunar</string>
+    <string name="summary_lunar_checkbox_preference">Is lunar birthday</string>
+    
+    <string name="title_repeat_preference">Repeat</string>
+    <string name="summary_repeat_preference">10</string>
+    <string name="dialog_title_repeat_preference">Set repeat years</string>
+    
+    <string name="title_early_checkbox_preference">Remind early</string>
+    <string name="summary_early_checkbox_preference">Remind on the day before birthday</string>
+    
+    
+    <string name="title_method_preference">Remind method</string>
+    <string name="summary_method_preference">Select remind method</string>
+    <string name="dialog_title_method_preference">Remind method</string>
+    
+    <string name="pref_upload_buckets_image">upload.buckets_image</string>
+    
+    <string name="email">Email</string>
+    
+    <string name="inline_preferences">Happy birthday</string>
     
 </resources>

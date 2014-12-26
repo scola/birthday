@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <PreferenceCategory
+            android:title="@string/inline_preferences">
+            
+        <com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference
+		        android:key="name"
+		        android:title="@string/title_name_preference"
+		        android:summary="@string/summary_name_preference"
+		        android:dialogTitle="@string/dialog_title_name_preference" >
+        </com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference>
+        
+        <com.bignerdranch.android.criminalintent.preference.DatePreference
+            	android:key="date"
+            	android:title="@string/title_date_preference"
+            	android:summary="@string/summary_date_preference"
+            	android:dialogTitle="@string/dialog_title_date_preference" >
+        </com.bignerdranch.android.criminalintent.preference.DatePreference>
+        
+        <CheckBoxPreference
+            	android:defaultValue="true"
+                android:key="lunar"
+                android:title="@string/title_lunar_preference"
+                android:summary="@string/summary_lunar_checkbox_preference" />
+                
+        <com.bignerdranch.android.criminalintent.preference.TimePreference
+            	android:key="time"
+            	android:title="@string/title_remind_time_preference"
+            	android:summary="@string/summary_time_preference"
+            	android:dialogTitle="@string/dialog_title_remind_time_preference" >
+        </com.bignerdranch.android.criminalintent.preference.TimePreference>
+        
+        <CheckBoxPreference
+            	android:defaultValue="false"
+                android:key="early"
+                android:title="@string/title_early_checkbox_preference"
+                android:summary="@string/summary_early_checkbox_preference" />
+        
+        <com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference
+				android:key="repeat"
+				android:title="@string/title_repeat_preference"
+				android:summary="@string/summary_repeat_preference"
+				android:dialogTitle="@string/dialog_title_repeat_preference" > 
+		</com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference>		    
+				
+		<com.bignerdranch.android.criminalintent.preference.ListPreferenceMultiSelect
+				android:defaultValue="email"
+			    android:key="method"
+			    android:title="@string/title_method_preference" 
+			    android:dialogTitle="@string/dialog_title_method_preference"
+			    android:summary="@string/email"
+			    android:entries="@array/pref_method_default_entries"
+			    android:entryValues="@array/pref_method_default_values" >
+		</com.bignerdranch.android.criminalintent.preference.ListPreferenceMultiSelect>
+        
+    </PreferenceCategory>              
+        
+</PreferenceScreen>
