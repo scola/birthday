@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="app_name">CriminalIntent</string>
+  <string name="crime_title_hint">Enter a title for this crime.</string>
+  <string name="crime_title_label">Title</string> 
+    
+</resources>
