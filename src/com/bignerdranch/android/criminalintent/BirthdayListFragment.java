@@ -54,7 +54,7 @@ public class BirthdayListFragment extends ListFragment {
             titleTextView.setText(c.getName());
             TextView dateTextView =
                 (TextView)convertView.findViewById(R.id.birthday_list_item_dateTextView);
-            dateTextView.setText(c.getDate().toString());
+            dateTextView.setText(c.getDate());
 
             return convertView;
         }
