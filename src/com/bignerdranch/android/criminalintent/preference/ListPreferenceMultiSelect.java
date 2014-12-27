@@ -54,6 +54,7 @@ public class ListPreferenceMultiSelect extends ListPreference {
         }
      // Initialize the array of boolean to the same size as number of entries
         mClickedDialogEntryIndices = new boolean[getEntries().length];
+        mClickedDialogEntryIndices[0] = true;
         mDefaultSummary = getSummary();
     }
 	
