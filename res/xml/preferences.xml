@@ -4,19 +4,19 @@
     <PreferenceCategory
             android:title="@string/inline_preferences">
             
-        <com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference
+        <io.github.scola.birthday.preferences.SummaryEditTextPerference
 		        android:key="name"
 		        android:title="@string/title_name_preference"
 		        android:summary="@string/summary_name_preference"
 		        android:dialogTitle="@string/dialog_title_name_preference" >
-        </com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference>
+        </io.github.scola.birthday.preferences.SummaryEditTextPerference>
         
-        <com.bignerdranch.android.criminalintent.preference.DatePreference
+        <io.github.scola.birthday.preferences.DatePreference
             	android:key="date"
             	android:title="@string/title_date_preference"
             	android:summary="@string/summary_date_preference"
             	android:dialogTitle="@string/dialog_title_date_preference" >
-        </com.bignerdranch.android.criminalintent.preference.DatePreference>
+        </io.github.scola.birthday.preferences.DatePreference>
         
         <CheckBoxPreference
             	android:defaultValue="true"
@@ -24,12 +24,12 @@
                 android:title="@string/title_lunar_preference"
                 android:summary="@string/summary_lunar_checkbox_preference" />
                 
-        <com.bignerdranch.android.criminalintent.preference.TimePreference
+        <io.github.scola.birthday.preferences.TimePreference
             	android:key="time"
             	android:title="@string/title_remind_time_preference"
             	android:summary="@string/summary_time_preference"
             	android:dialogTitle="@string/dialog_title_remind_time_preference" >
-        </com.bignerdranch.android.criminalintent.preference.TimePreference>
+        </io.github.scola.birthday.preferences.TimePreference>
         
         <CheckBoxPreference
             	android:defaultValue="false"
@@ -37,14 +37,14 @@
                 android:title="@string/title_early_checkbox_preference"
                 android:summary="@string/summary_early_checkbox_preference" />
         
-        <com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference
+        <io.github.scola.birthday.preferences.SummaryEditTextPerference
 				android:key="repeat"
 				android:title="@string/title_repeat_preference"
 				android:summary="@string/summary_repeat_preference"
 				android:dialogTitle="@string/dialog_title_repeat_preference" > 
-		</com.bignerdranch.android.criminalintent.preference.SummaryEditTextPerference>		    
+		</io.github.scola.birthday.preferences.SummaryEditTextPerference>		    
 				
-		<com.bignerdranch.android.criminalintent.preference.ListPreferenceMultiSelect
+		<io.github.scola.birthday.preferences.ListPreferenceMultiSelect
 				android:defaultValue="email"
 			    android:key="method"
 			    android:title="@string/title_method_preference" 
@@ -52,7 +52,7 @@
 			    android:summary="@string/email"
 			    android:entries="@array/pref_method_default_entries"
 			    android:entryValues="@array/pref_method_default_values" >
-		</com.bignerdranch.android.criminalintent.preference.ListPreferenceMultiSelect>
+		</io.github.scola.birthday.preferences.ListPreferenceMultiSelect>
         
     </PreferenceCategory>              
         
