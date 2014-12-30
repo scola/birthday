@@ -44,6 +44,7 @@ containing a value of this type.
         public static final int birthday_list_item_dateTextView=0x7f070003;
         public static final int birthday_list_item_nameTextView=0x7f070002;
         public static final int fragmentContainer=0x7f070001;
+        public static final int menu_item_new_birthday=0x7f070005;
         public static final int text1=0x7f070004;
         public static final int viewPager=0x7f070000;
     }
@@ -52,6 +53,9 @@ containing a value of this type.
         public static final int activity_fragment=0x7f030001;
         public static final int list_item_birthday=0x7f030002;
         public static final int simple_list_item_1=0x7f030003;
+    }
+    public static final class menu {
+        public static final int fragment_birthday_list=0x7f0a0000;
     }
     public static final class string {
         public static final int app_name=0x7f080000;
@@ -65,6 +69,7 @@ containing a value of this type.
         public static final int dialog_title_repeat_preference=0x7f080010;
         public static final int email=0x7f080017;
         public static final int inline_preferences=0x7f080018;
+        public static final int new_birthday=0x7f08001a;
         public static final int pref_upload_buckets_image=0x7f080016;
         public static final int summary_date_preference=0x7f08000a;
         public static final int summary_early_checkbox_preference=0x7f080012;

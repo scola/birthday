@@ -14,12 +14,13 @@ public class BirthdayLab {
     private BirthdayLab(Context appContext) {
         mAppContext = appContext;
         mBirthdays = new ArrayList<Birthday>();
-        for (int i = 0; i < 100; i++) {
-            Birthday c = new Birthday();
-            c.setName("Name #" + (i + 1));
-            c.setDate("07-" + (i + 1)); // every other one
-            mBirthdays.add(c);
-        }
+//        for (int i = 0; i < 100; i++) {
+//            Birthday c = new Birthday();
+//            c.setName("Name #" + (i + 1));
+//            c.setDate("07-" + (i + 1)); // every other one
+//            //c.setRepeat(10);
+//            mBirthdays.add(c);
+//        }
     }
 
     public static BirthdayLab get(Context c) {
@@ -40,5 +41,14 @@ public class BirthdayLab {
     public ArrayList<Birthday> getBirthdays() {
         return mBirthdays;
     }
+    
+    public void addBirthday(Birthday c) {
+        mBirthdays.add(c);
+    }
+    
+    public void deleteBirthday(Birthday c) {
+        mBirthdays.remove(c);
+    }
+
 }
 

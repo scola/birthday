@@ -7,12 +7,15 @@ import io.github.scola.birthday.preferences.SummaryEditTextPerference;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.MenuItem;
 
 public class BirthdayFragment extends PreferenceFragment 
 				implements OnSharedPreferenceChangeListener{
@@ -51,11 +54,17 @@ public class BirthdayFragment extends PreferenceFragment
         UUID birthdayId = (UUID)getArguments().getSerializable(EXTRA_BIRTHDAY_ID);
         mBirthday = BirthdayLab.get(getActivity()).getBirthday(birthdayId);
         SummaryEditTextPerference preference = (SummaryEditTextPerference)findPreference(KEY_NAME_PREFERENCE);
-        preference.setSummary(mBirthday.getName());
+        //preference.setSummary(mBirthday.getName());
+        
+        setHasOptionsMenu(true);
         //preference.getDialog()
         //preference.getEditText().setText("fuck");
-    }
-    
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+        } 
+    }  
+  
     @Override
     public void onResume(){
         super.onResume();
@@ -116,6 +125,18 @@ public class BirthdayFragment extends PreferenceFragment
     		}
         }
 
+    }
+	
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(getActivity());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        } 
     }
     
 /*
