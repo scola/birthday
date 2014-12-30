@@ -18,6 +18,9 @@ public class Birthday {
 	
     public Birthday() {
         mId = UUID.randomUUID();
+        //mName = 
+        mDate = "06-08";
+        mTime = "12:00";
         isLunar = true;
         isEarly = false;
         mRepeat = 10;

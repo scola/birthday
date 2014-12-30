@@ -3,14 +3,12 @@ package io.github.scola.birthday;
 import java.util.UUID;
 
 import io.github.scola.birthday.R;
-import io.github.scola.birthday.preferences.SummaryEditTextPerference;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v4.app.NavUtils;
@@ -53,8 +51,30 @@ public class BirthdayFragment extends PreferenceFragment
         addPreferencesFromResource(R.xml.preferences);
         UUID birthdayId = (UUID)getArguments().getSerializable(EXTRA_BIRTHDAY_ID);
         mBirthday = BirthdayLab.get(getActivity()).getBirthday(birthdayId);
-        SummaryEditTextPerference preference = (SummaryEditTextPerference)findPreference(KEY_NAME_PREFERENCE);
-        //preference.setSummary(mBirthday.getName());
+        Preference preference = findPreference(KEY_NAME_PREFERENCE);
+        if(mBirthday.getName() == null) {
+        	mBirthday.setName(getResources().getString(R.string.summary_name_preference));
+        }
+        preference.setSummary(mBirthday.getName());
+        
+        preference = findPreference(KEY_DATE_PREFERENCE);
+        preference.setSummary(mBirthday.getDate());
+        
+        preference = findPreference(KEY_LUNAR_PREFERENCE);
+        ((CheckBoxPreference)preference).setChecked(mBirthday.getIsLunar());
+        
+        preference = findPreference(KEY_TIME_PREFERENCE);
+        preference.setSummary(mBirthday.getTime());
+        
+        preference = findPreference(KEY_EARLY_PREFERENCE);
+        ((CheckBoxPreference)preference).setChecked(mBirthday.getIsEarly());
+        
+        preference = findPreference(KEY_REPEAT_PREFERENCE);
+        preference.setSummary(Integer.toString(mBirthday.getRepeat()));
+        
+        preference = findPreference(KEY_METHOD_PREFERENCE);
+        preference.setSummary(mBirthday.getMethod());
+        
         
         setHasOptionsMenu(true);
         //preference.getDialog()
@@ -82,8 +102,24 @@ public class BirthdayFragment extends PreferenceFragment
             .unregisterOnSharedPreferenceChangeListener(this);        
 
     	Preference preference = findPreference(KEY_NAME_PREFERENCE);
-        String summary = (preference).getSummary().toString().trim();
+        String summary = preference.getSummary().toString().trim();
         mBirthday.setName(summary);
+        
+        preference = findPreference(KEY_DATE_PREFERENCE);
+        summary = preference.getSummary().toString().trim();
+        mBirthday.setDate(summary);
+        
+        preference = findPreference(KEY_TIME_PREFERENCE);
+        summary = preference.getSummary().toString().trim();
+        mBirthday.setTime(summary);
+        
+        preference = findPreference(KEY_REPEAT_PREFERENCE);
+        summary = preference.getSummary().toString().trim();
+        mBirthday.setRepeat(Integer.parseInt(summary));
+        
+        preference = findPreference(KEY_METHOD_PREFERENCE);
+        summary = preference.getSummary().toString().trim();
+        mBirthday.setMethod(summary);
 
     }
 	
@@ -104,26 +140,27 @@ public class BirthdayFragment extends PreferenceFragment
             }else{
             	mBirthday.setIsEarly(isChecked);
             }
-        } else {
-        	String summary = (preference).getSummary().toString().trim();        	
-        	if(summary.length() == 0) return;
-    		if (key.equals(KEY_NAME_PREFERENCE)) {
-    			Log.d(TAG, "setName when input name: " + summary);
-    			mBirthday.setName(summary);
-    		}    		
-    		if (key.equals(KEY_DATE_PREFERENCE)) {
-    			mBirthday.setDate(summary);
-    		}
-    		if (key.equals(KEY_TIME_PREFERENCE)) {
-    			mBirthday.setTime(summary);
-    		}
-    		if (key.equals(KEY_REPEAT_PREFERENCE)) {
-    			mBirthday.setRepeat(Integer.parseInt(summary));
-    		}
-    		if (key.equals(KEY_METHOD_PREFERENCE)) {
-    			mBirthday.setMethod(summary);
-    		}
-        }
+        } 
+//        else {
+//        	String summary = (preference).getSummary().toString().trim();        	
+//        	if(summary.length() == 0) return;
+//    		if (key.equals(KEY_NAME_PREFERENCE)) {
+//    			Log.d(TAG, "setName when input name: " + summary);
+//    			mBirthday.setName(summary);
+//    		}    		
+//    		if (key.equals(KEY_DATE_PREFERENCE)) {
+//    			mBirthday.setDate(summary);
+//    		}
+//    		if (key.equals(KEY_TIME_PREFERENCE)) {
+//    			mBirthday.setTime(summary);
+//    		}
+//    		if (key.equals(KEY_REPEAT_PREFERENCE)) {
+//    			mBirthday.setRepeat(Integer.parseInt(summary));
+//    		}
+//    		if (key.equals(KEY_METHOD_PREFERENCE)) {
+//    			mBirthday.setMethod(summary);
+//    		}
+//        }
 
     }
 	
