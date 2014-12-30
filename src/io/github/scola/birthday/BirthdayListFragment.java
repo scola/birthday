@@ -35,7 +35,7 @@ public class BirthdayListFragment extends ListFragment {
         Birthday c = (Birthday)(getListAdapter()).getItem(position);
         //Log.d(TAG, c.getTitle() + " was clicked");
         // start an instance of CrimeActivity
-        Intent i = new Intent(getActivity(), BirthdayActivity.class);
+        Intent i = new Intent(getActivity(), BirthdayPagerActivity.class);
         i.putExtra(BirthdayFragment.EXTRA_BIRTHDAY_ID, c.getId());
         startActivityForResult(i, 0);
     }

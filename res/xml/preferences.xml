@@ -6,6 +6,7 @@
             
         <io.github.scola.birthday.preferences.SummaryEditTextPerference
 		        android:key="name"
+		        android:inputType="textPersonName"
 		        android:title="@string/title_name_preference"
 		        android:summary="@string/summary_name_preference"
 		        android:dialogTitle="@string/dialog_title_name_preference" >
@@ -38,6 +39,8 @@
                 android:summary="@string/summary_early_checkbox_preference" />
         
         <io.github.scola.birthday.preferences.SummaryEditTextPerference
+            	android:defaultValue="10"
+            	android:inputType="number"
 				android:key="repeat"
 				android:title="@string/title_repeat_preference"
 				android:summary="@string/summary_repeat_preference"

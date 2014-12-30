@@ -54,7 +54,7 @@ public class ListPreferenceMultiSelect extends ListPreference {
         }
      // Initialize the array of boolean to the same size as number of entries
         mClickedDialogEntryIndices = new boolean[getEntries().length];
-        mClickedDialogEntryIndices[0] = true;
+        //mClickedDialogEntryIndices[0] = true;
         mDefaultSummary = getSummary();
     }
 	
@@ -118,7 +118,12 @@ public class ListPreferenceMultiSelect extends ListPreference {
     
     private void restoreCheckedEntries() {
     	CharSequence[] entryValues = getEntryValues();
-    	
+    	String summary = getSummary().toString();
+    	for ( int i=0; i<entryValues.length; i++ ) {
+    		if(summary.contains(entryValues[i]))
+    			mClickedDialogEntryIndices[i] = true;
+    	}
+    	/*    	
     	// Explode the string read in sharedpreferences
     	String[] vals = parseStoredValue(getValue());
     	
@@ -137,6 +142,7 @@ public class ListPreferenceMultiSelect extends ListPreference {
     	} else {
     		mClickedDialogEntryIndices[0] = true;
     	}
+    	*/
     }
 
 	@Override
