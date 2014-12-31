@@ -63,6 +63,7 @@ public class BirthdayLab {
     
     public void deleteBirthday(Birthday c) {
         mBirthdays.remove(c);
+        saveBirthdays();
     }
     
     public boolean saveBirthdays() {

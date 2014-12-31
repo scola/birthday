@@ -38,13 +38,15 @@ containing a value of this type.
         public static final int your_defined_minumum_height=0x7f060002;
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
+        public static final int background_activated=0x7f020000;
+        public static final int ic_launcher=0x7f020001;
     }
     public static final class id {
         public static final int birthday_list_item_dateTextView=0x7f070003;
         public static final int birthday_list_item_nameTextView=0x7f070002;
         public static final int fragmentContainer=0x7f070001;
-        public static final int menu_item_new_birthday=0x7f070005;
+        public static final int menu_item_delete_birthday=0x7f070005;
+        public static final int menu_item_new_birthday=0x7f070006;
         public static final int text1=0x7f070004;
         public static final int viewPager=0x7f070000;
     }
@@ -55,13 +57,15 @@ containing a value of this type.
         public static final int simple_list_item_1=0x7f030003;
     }
     public static final class menu {
-        public static final int fragment_birthday_list=0x7f0a0000;
+        public static final int birthday_list_item_context=0x7f0a0000;
+        public static final int fragment_birthday_list=0x7f0a0001;
     }
     public static final class string {
         public static final int app_name=0x7f080000;
         public static final int birthdays_title=0x7f080019;
         public static final int crime_title_hint=0x7f080001;
         public static final int crime_title_label=0x7f080002;
+        public static final int delete_birthday=0x7f08001b;
         public static final int dialog_title_date_preference=0x7f08000b;
         public static final int dialog_title_method_preference=0x7f080015;
         public static final int dialog_title_name_preference=0x7f080005;

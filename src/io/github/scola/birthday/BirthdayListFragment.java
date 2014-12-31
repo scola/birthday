@@ -20,6 +20,12 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import android.view.ActionMode;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+
 public class BirthdayListFragment extends ListFragment {
 	
 	private static final String TAG = "BirthdayListFragment";
@@ -35,6 +41,60 @@ public class BirthdayListFragment extends ListFragment {
         BirthdayAdapter adapter = new BirthdayAdapter(mBirthdays);
         setListAdapter(adapter);
         setRetainInstance(true);
+    }
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, parent, savedInstanceState);
+        
+        ListView listView = (ListView)v.findViewById(android.R.id.list);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            registerForContextMenu(listView);
+        } else {
+            listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+            listView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+            
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.birthday_list_item_context, menu);
+                    return true;
+                }
+            
+                public void onItemCheckedStateChanged(ActionMode mode, int position,
+                        long id, boolean checked) {
+                }
+            
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.menu_item_delete_birthday:
+                            BirthdayAdapter adapter = (BirthdayAdapter)getListAdapter();
+                            BirthdayLab birthdayLab = BirthdayLab.get(getActivity());
+                            for (int i = adapter.getCount() - 1; i >= 0; i--) {
+                                if (getListView().isItemChecked(i)) {
+                                    birthdayLab.deleteBirthday(adapter.getItem(i));
+                                }
+                            }
+                            mode.finish(); 
+                            adapter.notifyDataSetChanged();
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+          
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+                
+                public void onDestroyActionMode(ActionMode mode) {
+
+                }
+            });
+            
+        }
+
+        return v;
     }
     
     @Override
