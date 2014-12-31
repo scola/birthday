@@ -73,8 +73,10 @@ containing a value of this type.
         public static final int dialog_title_repeat_preference=0x7f080010;
         public static final int email=0x7f080017;
         public static final int inline_preferences=0x7f080018;
+        public static final int lunar=0x7f08001c;
         public static final int new_birthday=0x7f08001a;
         public static final int pref_upload_buckets_image=0x7f080016;
+        public static final int solar=0x7f08001d;
         public static final int summary_date_preference=0x7f08000a;
         public static final int summary_early_checkbox_preference=0x7f080012;
         public static final int summary_lunar_checkbox_preference=0x7f08000d;

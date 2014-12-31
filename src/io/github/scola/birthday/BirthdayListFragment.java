@@ -155,7 +155,8 @@ public class BirthdayListFragment extends ListFragment {
             titleTextView.setText(c.getName());
             TextView dateTextView =
                 (TextView)convertView.findViewById(R.id.birthday_list_item_dateTextView);
-            dateTextView.setText(c.getDate());
+            
+            dateTextView.setText((c.getIsLunar() ? getResources().getString(R.string.lunar) : getResources().getString(R.string.solar)) + " " + c.getDate());
 
             return convertView;
         }

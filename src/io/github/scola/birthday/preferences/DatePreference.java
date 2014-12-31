@@ -1,5 +1,7 @@
 package io.github.scola.birthday.preferences;
 
+import io.github.scola.birthday.utils.Util;
+
 import java.lang.reflect.Field;
 
 import android.annotation.TargetApi;
@@ -14,8 +16,8 @@ import android.view.View;
 import android.widget.DatePicker;
 
 public class DatePreference extends DialogPreference {
-	private int lastMonth=0;
-    private int lastDay=0;
+	private int lastMonth;
+    private int lastDay;
     private DatePicker picker=null;
 
     public static int getHour(String date) {
@@ -31,28 +33,12 @@ public class DatePreference extends DialogPreference {
     }
 
     public DatePreference(Context ctxt, AttributeSet attrs) {
-        super(ctxt, attrs);
+        super(ctxt, attrs);      
 
         setPositiveButtonText("Set");
         setNegativeButtonText("Cancel");
     }
     
-    
-    public class CustomerDatePickerDialog extends DatePickerDialog {
-
-        public CustomerDatePickerDialog(Context context,
-                OnDateSetListener callBack, int year, int monthOfYear,
-                int dayOfMonth) {
-            super(context, callBack, year, monthOfYear, dayOfMonth);
-        }
-
-        @Override
-        public void onDateChanged(DatePicker view, int year, int month, int day) {
-            super.onDateChanged(view, year, month, day);
-            //mDialog.setTitle((month + 1) + "ÔÂ" + day + "ÈÕ");
-        }
-    }    
-   
     @Override
     protected View onCreateDialogView() {
         picker=new DatePicker(getContext());
@@ -85,8 +71,12 @@ public class DatePreference extends DialogPreference {
 	@Override
     protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
-
-        picker.updateDate(2014, lastMonth, lastDay);
+        //Date date = new Date();
+        int[] month_day = Util.SplitString(getSummary().toString(), "-");
+        lastMonth = month_day[0] - 1;
+        lastDay = month_day[1];
+        
+        picker.updateDate(2020, lastMonth, lastDay);
         picker.setCalendarViewShown(false);
         //picker.setCurrentMinute(lastMinute);
         //picker.setIs24HourView(true);
@@ -103,9 +93,9 @@ public class DatePreference extends DialogPreference {
 
             String date=String.format("%02d", lastMonth + 1) + "-" + String.format("%02d", lastDay);
 
-            if (callChangeListener(date)) {
-                persistString(date);
-            }
+//            if (callChangeListener(date)) {
+//                persistString(date);
+//            }
             setSummary(date);
         }
     }
@@ -131,7 +121,10 @@ public class DatePreference extends DialogPreference {
             time=defaultValue.toString();
         }
 
-        lastMonth=getHour(time);
-        lastDay=getMinute(time);
+//        lastMonth=getHour(time);
+//        lastDay=getMinute(time);
+        int[] month_day = Util.SplitString(getSummary().toString(), "-");
+        lastMonth = month_day[0] - 1;
+        lastDay = month_day[1];
     }
 }

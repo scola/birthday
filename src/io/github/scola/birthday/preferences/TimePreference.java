@@ -8,9 +8,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
 
+import io.github.scola.birthday.utils.Util;
+
 public class TimePreference extends DialogPreference {
-    private int lastHour=0;
-    private int lastMinute=0;
+    private int lastHour;
+    private int lastMinute;
     private TimePicker picker=null;
 
     private static final String TAG = "TimePreference";
@@ -29,6 +31,10 @@ public class TimePreference extends DialogPreference {
 
     public TimePreference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);
+        
+        int[] hour_minute = Util.SplitString(getSummary().toString(), ":");
+        lastHour = hour_minute[0];
+        lastMinute = hour_minute[1];
 
         setPositiveButtonText("Set");
         setNegativeButtonText("Cancel");
