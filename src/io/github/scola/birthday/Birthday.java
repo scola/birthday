@@ -1,11 +1,23 @@
 package io.github.scola.birthday;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Birthday {
+	
+    private static final String JSON_ID = "id";
+    private static final String JSON_NAME = "name";
+    private static final String JSON_DATE = "date";
+    private static final String JSON_TIME = "time";
+    private static final String JSON_LUNAR = "lunar";
+    private static final String JSON_EARLY = "early";
+    private static final String JSON_REPEAT = "repeat";
+    private static final String JSON_METHOD = "method";    
+	
 	private UUID mId;
 	private String mName;
 	private String mDate;
@@ -18,7 +30,6 @@ public class Birthday {
 	
     public Birthday() {
         mId = UUID.randomUUID();
-        //mName = 
         mDate = "06-08";
         mTime = "12:00";
         isLunar = true;
@@ -26,6 +37,32 @@ public class Birthday {
         mRepeat = 10;
         mMethod = "Email";
         mEventId = new ArrayList<String>();
+    }
+    
+    public Birthday(JSONObject json) throws JSONException {
+        mId = UUID.fromString(json.getString(JSON_ID));
+        mName = json.getString(JSON_NAME);
+        mDate = json.getString(JSON_DATE);
+        mTime = json.getString(JSON_TIME);
+        isLunar = json.getBoolean(JSON_LUNAR);
+        isEarly = json.getBoolean(JSON_EARLY);
+        mRepeat = json.getInt(JSON_REPEAT);
+        mMethod = json.getString(JSON_METHOD);     
+        //event id not available
+    }
+
+    public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put(JSON_ID, mId.toString());
+        json.put(JSON_NAME, mName);
+        json.put(JSON_DATE, mDate);
+        json.put(JSON_TIME, mTime);
+        json.put(JSON_LUNAR, isLunar);
+        json.put(JSON_EARLY, isEarly);
+        json.put(JSON_REPEAT, mRepeat);
+        json.put(JSON_METHOD, mMethod);
+        //event id not available
+        return json;
     }
 
 	public String getName() {

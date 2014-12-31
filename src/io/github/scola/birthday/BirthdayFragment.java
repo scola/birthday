@@ -120,7 +120,8 @@ public class BirthdayFragment extends PreferenceFragment
         preference = findPreference(KEY_METHOD_PREFERENCE);
         summary = preference.getSummary().toString().trim();
         mBirthday.setMethod(summary);
-
+        
+        BirthdayLab.get(getActivity()).saveBirthdays();
     }
 	
 	//@Override
