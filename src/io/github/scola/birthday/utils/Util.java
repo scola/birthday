@@ -3,7 +3,6 @@ package io.github.scola.birthday.utils;
 import io.github.scola.birthday.Birthday;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Util {
 	public static int[] SplitString(String summary, String sep) {
