@@ -39,6 +39,16 @@ public class Birthday {
         mEventId = new ArrayList<String>();
     }
     
+    public Birthday(Birthday copy) {
+    	mName = copy.mName;
+        mDate = copy.mDate;
+        mTime = copy.mTime;
+        isLunar = copy.isLunar;
+        isEarly = copy.isEarly;
+        mRepeat = copy.mRepeat;
+        mMethod = copy.mMethod;
+    }
+    
     public Birthday(JSONObject json) throws JSONException {
         mId = UUID.fromString(json.getString(JSON_ID));
         mName = json.getString(JSON_NAME);
@@ -133,4 +143,26 @@ public class Birthday {
 		return mId;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		Birthday birthday = (Birthday)o;
+		return birthday.mName.equals(mName) &&
+			   birthday.mDate.equals(mDate) &&
+			   birthday.mTime.equals(mTime) &&
+			   birthday.isLunar.equals(isLunar) &&
+			   birthday.isEarly.equals(isEarly) &&
+			   birthday.mRepeat == mRepeat &&
+			   birthday.mMethod.equals(mMethod);
+	}
+	
+	@Override
+	public String toString() {
+		return mName + " " +
+			   mDate + " " +
+			   mTime + " " +
+			   "isLunar" + isLunar + " " +
+			   "isEarly" + isEarly + " " +
+			   mRepeat + " " +
+			   mMethod;
+	}
 }

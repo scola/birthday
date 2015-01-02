@@ -3,6 +3,7 @@ package io.github.scola.birthday;
 import java.util.ArrayList;
 
 import io.github.scola.birthday.R;
+import io.github.scola.birthday.utils.Util;
 
 import android.content.Intent;
 import android.os.Build;
@@ -31,6 +32,7 @@ public class BirthdayListFragment extends ListFragment {
 	private static final String TAG = "BirthdayListFragment";
 	
     private ArrayList<Birthday> mBirthdays;
+    private ArrayList<Birthday> mSyncedBirthdays;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +102,9 @@ public class BirthdayListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) { 
         Birthday c = (Birthday)(getListAdapter()).getItem(position);
+        mSyncedBirthdays = Util.cloneList(mBirthdays);
+        //mSyncedBirthdays = (ArrayList<Birthday>)mBirthdays.clone();
+        Log.d(TAG, "mSyncedBirthdays first " + mSyncedBirthdays.get(0));
         //Log.d(TAG, c.getTitle() + " was clicked");
         // start an instance of birthdayActivity
         Intent i = new Intent(getActivity(), BirthdayPagerActivity.class);
@@ -111,6 +116,13 @@ public class BirthdayListFragment extends ListFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
+        for(int i = 0; i < mBirthdays.size(); i++) {
+        	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
+        		Log.d(TAG, "birthday " + i + " not change " + mSyncedBirthdays.get(i));
+        		continue;
+        	}
+        	Log.d(TAG, "birthday " + i + " changed");
+        }
     }
     
     @Override
