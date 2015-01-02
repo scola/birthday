@@ -30,12 +30,8 @@ public class TimePreference extends DialogPreference {
     }
 
     public TimePreference(Context ctxt, AttributeSet attrs) {
-        super(ctxt, attrs);
+        super(ctxt, attrs);      
         
-        int[] hour_minute = Util.SplitString(getSummary().toString(), ":");
-        lastHour = hour_minute[0];
-        lastMinute = hour_minute[1];
-
         setPositiveButtonText("Set");
         setNegativeButtonText("Cancel");
     }
@@ -50,10 +46,14 @@ public class TimePreference extends DialogPreference {
     @Override
     protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
+        picker.setIs24HourView(true);
+        
+        int[] hour_minute = Util.SplitString(getSummary().toString(), ":");
+        lastHour = hour_minute[0];
+        lastMinute = hour_minute[1];
 
         picker.setCurrentHour(lastHour);
-        picker.setCurrentMinute(lastMinute);
-        picker.setIs24HourView(true);
+        picker.setCurrentMinute(lastMinute);        
     }
 
     @Override

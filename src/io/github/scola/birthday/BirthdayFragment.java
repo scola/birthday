@@ -121,6 +121,14 @@ public class BirthdayFragment extends PreferenceFragment
         summary = preference.getSummary().toString().trim();
         mBirthday.setMethod(summary);
         
+        preference = findPreference(KEY_LUNAR_PREFERENCE);
+        Boolean isChecked = ((CheckBoxPreference)preference).isChecked();
+        mBirthday.setIsLunar(isChecked);
+        
+        preference = findPreference(KEY_EARLY_PREFERENCE);
+        isChecked = ((CheckBoxPreference)preference).isChecked();
+        mBirthday.setIsEarly(isChecked);
+        
         BirthdayLab.get(getActivity()).saveBirthdays();
     }
 	
@@ -131,17 +139,17 @@ public class BirthdayFragment extends PreferenceFragment
     }
 	
 	private void updatePreference(String key){
-		Log.d(TAG, "Preference changed");
-        Preference preference = findPreference(key);
-        if (preference instanceof CheckBoxPreference){
-        	CheckBoxPreference checkBoxPreference =  (CheckBoxPreference)preference;
-            Boolean isChecked = checkBoxPreference.isChecked();
-            if (key.equals(KEY_LUNAR_PREFERENCE)){
-            	mBirthday.setIsLunar(isChecked);
-            }else{
-            	mBirthday.setIsEarly(isChecked);
-            }
-        } 
+//		Log.d(TAG, "Preference changed");
+//        Preference preference = findPreference(key);
+//        if (preference instanceof CheckBoxPreference){
+//        	CheckBoxPreference checkBoxPreference =  (CheckBoxPreference)preference;
+//            Boolean isChecked = checkBoxPreference.isChecked();
+//            if (key.equals(KEY_LUNAR_PREFERENCE)){
+//            	mBirthday.setIsLunar(isChecked);
+//            }else{
+//            	mBirthday.setIsEarly(isChecked);
+//            }
+//        } 
 //        else {
 //        	String summary = (preference).getSummary().toString().trim();        	
 //        	if(summary.length() == 0) return;
