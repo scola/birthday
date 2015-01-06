@@ -16,6 +16,9 @@ package com.google.api.services.samples.calendar.android;
 
 import com.google.api.services.calendar.model.Calendar;
 
+//import io.github.scola.birthday.BirthdayListActivity;
+import io.github.scola.birthday.BirthdayListFragment;
+
 import java.io.IOException;
 
 /**
@@ -27,7 +30,7 @@ class AsyncInsertCalendar extends CalendarAsyncTask {
 
   private final Calendar entry;
 
-  AsyncInsertCalendar(CalendarSampleActivity calendarSample, Calendar entry) {
+  AsyncInsertCalendar(BirthdayListFragment calendarSample, Calendar entry) {
     super(calendarSample);
     this.entry = entry;
   }

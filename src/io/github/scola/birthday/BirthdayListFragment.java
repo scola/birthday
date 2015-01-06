@@ -2,9 +2,13 @@ package io.github.scola.birthday;
 
 import java.util.ArrayList;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.services.samples.calendar.android.CalendarModel;
+
 import io.github.scola.birthday.R;
 import io.github.scola.birthday.utils.Util;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -29,14 +34,23 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class BirthdayListFragment extends ListFragment {
 	
-	private static final String TAG = "BirthdayListFragment";
+	public static final String TAG = "BirthdayListFragment";
 	
     private ArrayList<Birthday> mBirthdays;
     private ArrayList<Birthday> mSyncedBirthdays;
+    
+    public static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
+	public static final int REQUEST_AUTHORIZATION = 1;
+
+	public int numAsyncTasks;
+	public CalendarModel model = new CalendarModel();
+	public com.google.api.services.calendar.Calendar client;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+//        getActivity().requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.birthdays_title);
         mBirthdays = BirthdayLab.get(getActivity()).getBirthdays();
@@ -47,7 +61,9 @@ public class BirthdayListFragment extends ListFragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, parent, savedInstanceState);
+        View v = super.onCreateView(inflater, parent, savedInstanceState);   
+        
+        getActivity().setProgressBarIndeterminateVisibility(true);
         
         ListView listView = (ListView)v.findViewById(android.R.id.list);
 
@@ -172,6 +188,20 @@ public class BirthdayListFragment extends ListFragment {
 
             return convertView;
         }
+    }
+    
+    public void showGooglePlayServicesAvailabilityErrorDialog(final int connectionStatusCode) {
+        getActivity().runOnUiThread(new Runnable() {
+          public void run() {
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
+                connectionStatusCode, getActivity(), REQUEST_GOOGLE_PLAY_SERVICES);
+            dialog.show();
+          }
+        });
+    }
+    
+    public void refreshView() {
+    	
     }
     
 }

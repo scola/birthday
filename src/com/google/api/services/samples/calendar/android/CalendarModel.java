@@ -28,7 +28,7 @@ import java.util.Map;
  * 
  * @author Yaniv Inbar
  */
-class CalendarModel {
+public class CalendarModel {
 
   private final Map<String, CalendarInfo> calendars = new HashMap<String, CalendarInfo>();
 

@@ -20,6 +20,9 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import android.os.AsyncTask;
 import android.view.View;
 
+import io.github.scola.birthday.BirthdayListFragment;
+import io.github.scola.birthday.R;
+
 import java.io.IOException;
 
 /**
@@ -30,16 +33,16 @@ import java.io.IOException;
  */
 abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
-  final CalendarSampleActivity activity;
+  final BirthdayListFragment activity;
   final CalendarModel model;
   final com.google.api.services.calendar.Calendar client;
   private final View progressBar;
 
-  CalendarAsyncTask(CalendarSampleActivity activity) {
+  CalendarAsyncTask(BirthdayListFragment activity) {
     this.activity = activity;
     model = activity.model;
     client = activity.client;
-    progressBar = activity.findViewById(R.id.title_refresh_progress);
+    progressBar = activity.getListView().findViewById(R.id.title_refresh_progress);
   }
 
   @Override
@@ -59,9 +62,9 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
           availabilityException.getConnectionStatusCode());
     } catch (UserRecoverableAuthIOException userRecoverableException) {
       activity.startActivityForResult(
-          userRecoverableException.getIntent(), CalendarSampleActivity.REQUEST_AUTHORIZATION);
+          userRecoverableException.getIntent(), BirthdayListFragment.REQUEST_AUTHORIZATION);
     } catch (IOException e) {
-      Utils.logAndShow(activity, CalendarSampleActivity.TAG, e);
+      Utils.logAndShow(activity, BirthdayListFragment.TAG, e);
     }
     return false;
   }

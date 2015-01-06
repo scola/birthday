@@ -23,6 +23,9 @@ import android.content.res.Resources;
 import android.util.Log;
 import android.widget.Toast;
 
+import io.github.scola.birthday.BirthdayListFragment;
+import io.github.scola.birthday.R;
+
 /**
  * Common utilities.
  * 
@@ -33,11 +36,11 @@ public class Utils {
   /**
    * Logs the given throwable and shows an error alert dialog with its message.
    * 
-   * @param activity activity
+   * @param fragment fragment
    * @param tag log tag to use
    * @param t throwable to log and show
    */
-  public static void logAndShow(Activity activity, String tag, Throwable t) {
+  public static void logAndShow(BirthdayListFragment fragment, String tag, Throwable t) {
     Log.e(tag, "Error", t);
     String message = t.getMessage();
     if (t instanceof GoogleJsonResponseException) {
@@ -48,43 +51,43 @@ public class Utils {
     } else if (t.getCause() instanceof GoogleAuthException) {
       message = ((GoogleAuthException) t.getCause()).getMessage();
     }
-    showError(activity, message);
+    showError(fragment, message);
   }
 
   /**
    * Logs the given message and shows an error alert dialog with it.
    * 
-   * @param activity activity
+   * @param fragment fragment
    * @param tag log tag to use
    * @param message message to log and show or {@code null} for none
    */
-  public static void logAndShowError(Activity activity, String tag, String message) {
-    String errorMessage = getErrorMessage(activity, message);
+  public static void logAndShowError(BirthdayListFragment fragment, String tag, String message) {
+    String errorMessage = getErrorMessage(fragment, message);
     Log.e(tag, errorMessage);
-    showErrorInternal(activity, errorMessage);
+    showErrorInternal(fragment, errorMessage);
   }
 
   /**
    * Shows an error alert dialog with the given message.
    * 
-   * @param activity activity
+   * @param fragment fragment
    * @param message message to show or {@code null} for none
    */
-  public static void showError(Activity activity, String message) {
-    String errorMessage = getErrorMessage(activity, message);
-    showErrorInternal(activity, errorMessage);
+  public static void showError(BirthdayListFragment fragment, String message) {
+    String errorMessage = getErrorMessage(fragment, message);
+    showErrorInternal(fragment, errorMessage);
   }
 
-  private static void showErrorInternal(final Activity activity, final String errorMessage) {
-    activity.runOnUiThread(new Runnable() {
+  private static void showErrorInternal(final BirthdayListFragment fragment, final String errorMessage) {
+    fragment.getActivity().runOnUiThread(new Runnable() {
       public void run() {
-        Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
+        Toast.makeText(fragment.getActivity(), errorMessage, Toast.LENGTH_LONG).show();
       }
     });
   }
 
-  private static String getErrorMessage(Activity activity, String message) {
-    Resources resources = activity.getResources();
+  private static String getErrorMessage(BirthdayListFragment fragment, String message) {
+    Resources resources = fragment.getResources();
     if (message == null) {
       return resources.getString(R.string.error);
     }

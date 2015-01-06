@@ -44,6 +44,15 @@
     <string name="lunar">Lunar</string>
     <string name="solar">Solar</string>
     
+    <string name="error">Error</string>
+    <string name="error_format">[Error] %s</string>
+    
+    <string name="icon_desc">Application icon</string>
+    <string name="title_separator_desc">Title separator</string>
+    
+    <string name="description_add">Add Calendar</string>
+    
+    
     
     
 </resources>
