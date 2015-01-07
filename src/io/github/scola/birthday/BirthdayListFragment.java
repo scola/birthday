@@ -50,9 +50,12 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 import com.google.api.client.util.DateTime;
 
+import com.google.api.services.samples.calendar.android.AsyncInsertCalendar;
+
 public class BirthdayListFragment extends ListFragment {
 	
 	private static final String PREF_ACCOUNT_NAME = "accountName";
+	
 	
 	public static final String TAG = "BirthdayListFragment";
 	
@@ -68,11 +71,15 @@ public class BirthdayListFragment extends ListFragment {
 	public CalendarModel model = new CalendarModel();
 	public com.google.api.services.calendar.Calendar client;
 	
+	public final String PREF_GOOGLE_CALENDAR_ID = "calendarId";
+	
 	final HttpTransport transport = AndroidHttp.newCompatibleTransport();
 	
 	final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 	
 	GoogleAccountCredential credential;
+	
+	public String calendarId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,6 +105,7 @@ public class BirthdayListFragment extends ListFragment {
     @Override
     public void onResume() {
     	super.onResume();
+    	Log.d(TAG, "onResume");
     	if (checkGooglePlayServicesAvailable()) {
     	      haveGooglePlayServices();
     	}
@@ -111,6 +119,7 @@ public class BirthdayListFragment extends ListFragment {
         } else {
             // load calendars
 //          AsyncLoadCalendars.run(this);
+        	createNewCalendar();
         }
     }
     
@@ -128,11 +137,22 @@ public class BirthdayListFragment extends ListFragment {
       return true;
     }
     
+    private void createNewCalendar() {
+    	if(calendarId != null) return;
+    	SharedPreferences lunarBirthdayCalendarId = getActivity().getPreferences(Context.MODE_PRIVATE);
+    	calendarId = lunarBirthdayCalendarId.getString(PREF_GOOGLE_CALENDAR_ID, null);
+    	if(calendarId == null) {
+    		Calendar calendar = new Calendar();
+        	calendar.setSummary("Lunar Birthday");
+        	new AsyncInsertCalendar(this, calendar).execute();
+    	}
+    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, parent, savedInstanceState);   
         
-        getActivity().setProgressBarIndeterminateVisibility(true);
+//        getActivity().setProgressBarIndeterminateVisibility(true);
         
         ListView listView = (ListView)v.findViewById(android.R.id.list);
 
@@ -211,6 +231,7 @@ public class BirthdayListFragment extends ListFragment {
         case REQUEST_AUTHORIZATION:
           if (resultCode == Activity.RESULT_OK) {
 //            AsyncLoadCalendars.run(this);
+        	  createNewCalendar();
           } else {
             chooseAccount();
           }
@@ -225,20 +246,20 @@ public class BirthdayListFragment extends ListFragment {
               editor.putString(PREF_ACCOUNT_NAME, accountName);
               editor.commit();
 //              AsyncLoadCalendars.run(this);
+              createNewCalendar();
             }
           }
           break;
         case REQUEST_NEW_BIRTHDAY:
-          if (resultCode == Activity.RESULT_OK) {
-        	  ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
-              for(int i = 0; i < mBirthdays.size(); i++) {
-              	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
-              		Log.d(TAG, "birthday " + i + " not change " + mSyncedBirthdays.get(i));
-              		continue;
-              	}
-              	Log.d(TAG, "birthday " + i + " changed");
-              }
+    	  ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
+          for(int i = 0; i < mBirthdays.size(); i++) {
+          	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
+          		Log.d(TAG, "birthday " + i + " not change " + mSyncedBirthdays.get(i));
+          		continue;
+          	}
+          	Log.d(TAG, "birthday " + i + " changed");
           }
+
           break;
       }
     }

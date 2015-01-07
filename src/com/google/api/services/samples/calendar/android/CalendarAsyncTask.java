@@ -33,23 +33,24 @@ import java.io.IOException;
  */
 abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
-  final BirthdayListFragment activity;
+  final BirthdayListFragment fragment;
   final CalendarModel model;
   final com.google.api.services.calendar.Calendar client;
-  private final View progressBar;
+//  private final View progressBar;
 
-  CalendarAsyncTask(BirthdayListFragment activity) {
-    this.activity = activity;
-    model = activity.model;
-    client = activity.client;
-    progressBar = activity.getListView().findViewById(R.id.title_refresh_progress);
+  CalendarAsyncTask(BirthdayListFragment fragment) {
+    this.fragment = fragment;
+    model = fragment.model;
+    client = fragment.client;
+//    progressBar = fragment.getListView().findViewById(R.id.title_refresh_progress);
   }
 
   @Override
   protected void onPreExecute() {
     super.onPreExecute();
-    activity.numAsyncTasks++;
-    progressBar.setVisibility(View.VISIBLE);
+    fragment.numAsyncTasks++;
+//    progressBar.setVisibility(View.VISIBLE);
+    fragment.getActivity().setProgressBarIndeterminateVisibility(true);
   }
 
   @Override
@@ -58,13 +59,13 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
       doInBackground();
       return true;
     } catch (final GooglePlayServicesAvailabilityIOException availabilityException) {
-      activity.showGooglePlayServicesAvailabilityErrorDialog(
+      fragment.showGooglePlayServicesAvailabilityErrorDialog(
           availabilityException.getConnectionStatusCode());
     } catch (UserRecoverableAuthIOException userRecoverableException) {
-      activity.startActivityForResult(
+      fragment.startActivityForResult(
           userRecoverableException.getIntent(), BirthdayListFragment.REQUEST_AUTHORIZATION);
     } catch (IOException e) {
-      Utils.logAndShow(activity, BirthdayListFragment.TAG, e);
+      Utils.logAndShow(fragment, BirthdayListFragment.TAG, e);
     }
     return false;
   }
@@ -72,11 +73,12 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
   @Override
   protected final void onPostExecute(Boolean success) {
     super.onPostExecute(success);
-    if (0 == --activity.numAsyncTasks) {
-      progressBar.setVisibility(View.GONE);
+    if (0 == --fragment.numAsyncTasks) {
+//      progressBar.setVisibility(View.GONE);
+    	fragment.getActivity().setProgressBarIndeterminateVisibility(false);
     }
     if (success) {
-      activity.refreshView();
+      fragment.refreshView();
     }
   }
 

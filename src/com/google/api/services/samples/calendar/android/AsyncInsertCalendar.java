@@ -14,6 +14,9 @@
 
 package com.google.api.services.samples.calendar.android;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.google.api.services.calendar.model.Calendar;
 
 //import io.github.scola.birthday.BirthdayListActivity;
@@ -26,11 +29,11 @@ import java.io.IOException;
  * 
  * @author Yaniv Inbar
  */
-class AsyncInsertCalendar extends CalendarAsyncTask {
+public class AsyncInsertCalendar extends CalendarAsyncTask {
 
   private final Calendar entry;
 
-  AsyncInsertCalendar(BirthdayListFragment calendarSample, Calendar entry) {
+  public AsyncInsertCalendar(BirthdayListFragment calendarSample, Calendar entry) {
     super(calendarSample);
     this.entry = entry;
   }
@@ -38,6 +41,11 @@ class AsyncInsertCalendar extends CalendarAsyncTask {
   @Override
   protected void doInBackground() throws IOException {
     Calendar calendar = client.calendars().insert(entry).setFields(CalendarInfo.FIELDS).execute();
-    model.add(calendar);
+    SharedPreferences lunarBirthdayCalendarId = fragment.getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = lunarBirthdayCalendarId.edit();
+    editor.putString(fragment.PREF_GOOGLE_CALENDAR_ID, calendar.getId());
+    editor.commit();
+    fragment.calendarId = calendar.getId();
+//    model.add(calendar);
   }
 }
