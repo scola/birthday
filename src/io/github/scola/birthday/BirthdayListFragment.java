@@ -1,6 +1,7 @@
 package io.github.scola.birthday;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.services.samples.calendar.android.CalendarModel;
@@ -8,8 +9,11 @@ import com.google.api.services.samples.calendar.android.CalendarModel;
 import io.github.scola.birthday.R;
 import io.github.scola.birthday.utils.Util;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -25,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.accounts.AccountManager;
 
 import android.view.ActionMode;
 import android.view.ContextMenu;
@@ -32,7 +37,22 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Calendar;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
+import com.google.api.client.util.DateTime;
+
 public class BirthdayListFragment extends ListFragment {
+	
+	private static final String PREF_ACCOUNT_NAME = "accountName";
 	
 	public static final String TAG = "BirthdayListFragment";
 	
@@ -41,10 +61,18 @@ public class BirthdayListFragment extends ListFragment {
     
     public static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
 	public static final int REQUEST_AUTHORIZATION = 1;
+	public static final int REQUEST_ACCOUNT_PICKER = 2;
+	public static final int REQUEST_NEW_BIRTHDAY = 3;
 
 	public int numAsyncTasks;
 	public CalendarModel model = new CalendarModel();
 	public com.google.api.services.calendar.Calendar client;
+	
+	final HttpTransport transport = AndroidHttp.newCompatibleTransport();
+	
+	final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+	
+	GoogleAccountCredential credential;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +85,47 @@ public class BirthdayListFragment extends ListFragment {
         BirthdayAdapter adapter = new BirthdayAdapter(mBirthdays);
         setListAdapter(adapter);
         setRetainInstance(true);
+        
+        credential = GoogleAccountCredential.usingOAuth2(getActivity(), Collections.singleton(CalendarScopes.CALENDAR));
+        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+        credential.setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+        // Calendar client
+        client = new com.google.api.services.calendar.Calendar.Builder(
+            transport, jsonFactory, credential).setApplicationName("Google-CalendarAndroidSample/1.0")
+            .build();
+    }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	if (checkGooglePlayServicesAvailable()) {
+    	      haveGooglePlayServices();
+    	}
+    }
+    
+    private void haveGooglePlayServices() {
+        // check if there is already an account selected
+        if (credential.getSelectedAccountName() == null) {
+            // ask user to choose account
+            chooseAccount();
+        } else {
+            // load calendars
+//          AsyncLoadCalendars.run(this);
+        }
+    }
+    
+    private void chooseAccount() {
+        startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    }
+    
+    /** Check that Google Play services APK is installed and up to date. */
+    private boolean checkGooglePlayServicesAvailable() {
+      final int connectionStatusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
+      if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
+        showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
+        return false;
+      }
+      return true;
     }
     
     @Override
@@ -125,20 +194,53 @@ public class BirthdayListFragment extends ListFragment {
         // start an instance of birthdayActivity
         Intent i = new Intent(getActivity(), BirthdayPagerActivity.class);
         i.putExtra(BirthdayFragment.EXTRA_BIRTHDAY_ID, c.getId());
-        startActivityForResult(i, 0);
+        startActivityForResult(i, REQUEST_NEW_BIRTHDAY);
     }
 
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
-        for(int i = 0; i < mBirthdays.size(); i++) {
-        	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
-        		Log.d(TAG, "birthday " + i + " not change " + mSyncedBirthdays.get(i));
-        		continue;
-        	}
-        	Log.d(TAG, "birthday " + i + " changed");
-        }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {                
+        switch (requestCode) {
+        case REQUEST_GOOGLE_PLAY_SERVICES:
+          if (resultCode == Activity.RESULT_OK) {
+            haveGooglePlayServices();
+          } else {
+            checkGooglePlayServicesAvailable();
+          }
+          break;
+        case REQUEST_AUTHORIZATION:
+          if (resultCode == Activity.RESULT_OK) {
+//            AsyncLoadCalendars.run(this);
+          } else {
+            chooseAccount();
+          }
+          break;
+        case REQUEST_ACCOUNT_PICKER:
+          if (resultCode == Activity.RESULT_OK && data != null && data.getExtras() != null) {
+            String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+            if (accountName != null) {
+              credential.setSelectedAccountName(accountName);
+              SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+              SharedPreferences.Editor editor = settings.edit();
+              editor.putString(PREF_ACCOUNT_NAME, accountName);
+              editor.commit();
+//              AsyncLoadCalendars.run(this);
+            }
+          }
+          break;
+        case REQUEST_NEW_BIRTHDAY:
+          if (resultCode == Activity.RESULT_OK) {
+        	  ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
+              for(int i = 0; i < mBirthdays.size(); i++) {
+              	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
+              		Log.d(TAG, "birthday " + i + " not change " + mSyncedBirthdays.get(i));
+              		continue;
+              	}
+              	Log.d(TAG, "birthday " + i + " changed");
+              }
+          }
+          break;
+      }
     }
     
     @Override
@@ -155,7 +257,7 @@ public class BirthdayListFragment extends ListFragment {
                 BirthdayLab.get(getActivity()).addBirthday(birthday);
                 Intent i = new Intent(getActivity(), BirthdayActivity.class);
                 i.putExtra(BirthdayFragment.EXTRA_BIRTHDAY_ID, birthday.getId());
-                startActivityForResult(i, 0);
+                startActivityForResult(i, REQUEST_NEW_BIRTHDAY);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
