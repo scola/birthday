@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.services.samples.calendar.android.AsyncLoadCalendars;
 import com.google.api.services.samples.calendar.android.CalendarModel;
 
 import io.github.scola.birthday.R;
@@ -118,8 +119,8 @@ public class BirthdayListFragment extends ListFragment {
             chooseAccount();
         } else {
             // load calendars
-//          AsyncLoadCalendars.run(this);
-        	createNewCalendar();
+        	if(calendarId == null) AsyncLoadCalendars.run(this);
+//        	createNewCalendar();
         }
     }
     
@@ -137,7 +138,7 @@ public class BirthdayListFragment extends ListFragment {
       return true;
     }
     
-    private void createNewCalendar() {
+    public void createNewCalendar() {
     	if(calendarId != null) return;
     	SharedPreferences lunarBirthdayCalendarId = getActivity().getPreferences(Context.MODE_PRIVATE);
     	calendarId = lunarBirthdayCalendarId.getString(PREF_GOOGLE_CALENDAR_ID, null);
@@ -230,8 +231,8 @@ public class BirthdayListFragment extends ListFragment {
           break;
         case REQUEST_AUTHORIZATION:
           if (resultCode == Activity.RESULT_OK) {
-//            AsyncLoadCalendars.run(this);
-        	  createNewCalendar();
+        	  if(calendarId == null) AsyncLoadCalendars.run(this);
+//        	  createNewCalendar();
           } else {
             chooseAccount();
           }
@@ -245,8 +246,8 @@ public class BirthdayListFragment extends ListFragment {
               SharedPreferences.Editor editor = settings.edit();
               editor.putString(PREF_ACCOUNT_NAME, accountName);
               editor.commit();
-//              AsyncLoadCalendars.run(this);
-              createNewCalendar();
+              if(calendarId == null) AsyncLoadCalendars.run(this);
+//              createNewCalendar();
             }
           }
           break;
