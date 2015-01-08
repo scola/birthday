@@ -278,8 +278,78 @@ public class BirthdayListFragment extends ListFragment {
     
     private void createEvent(Birthday birthday) {
     	Log.d(TAG, "createEvent");  
+//    	List<EventReminder> eventReminderList = new ArrayList<EventReminder>();
+//    	String[] method = birthday.getMethod().toLowerCase().split(",");
+//    	for(int i = 0; i < method.length; i++) {
+//    		Log.d(TAG, "getMethod " + method[i]); 
+//    		EventReminder eventReminder = new EventReminder();
+//    		eventReminder.setMethod(method[i].trim());
+//			eventReminder.setMinutes(10);
+//			eventReminderList.add(eventReminder);
+//    	}
+    	
+    	Event event = new Event();
+//    	event.setSummary(birthday.getName() + getStringFromRes(R.string.event_summary));
+    	setSummary(event, birthday.getName(), birthday.getIsEarly());
+    	setRecurrence(event, birthday.getIsLunar(), birthday.getRepeat());
+    	
+//    	if(birthday.getIsLunar() == false && birthday.getRepeat() > 1) {
+//    		List<String> recurrenceList = new ArrayList<String>();
+//        	recurrenceList.add("RRULE:FREQ=YEARLY;COUNT=" + birthday.getRepeat());
+//        	event.setRecurrence(recurrenceList);
+//    	}    	
+//    	
+    	Date startDate = Util.getFirstDate(birthday.getDate(), birthday.getTime());
+    	setStartEndTime(event, startDate, birthday.getIsEarly());
+    	
+    	setRemind(event, birthday.getMethod());
+//    	
+//    	Date endDate = new Date(startDate.getTime() + 3600000);
+////    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
+//    	DateTime start = new DateTime(startDate, TimeZone.getDefault());
+//    	event.setStart(new EventDateTime().setDateTime(start).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
+//    	DateTime end = new DateTime(endDate, TimeZone.getDefault());
+//    	event.setEnd(new EventDateTime().setDateTime(end).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
+//    	
+//    	Event.Reminders reminder = new Event.Reminders();
+//    	reminder.setUseDefault(false);
+//    	reminder.setOverrides(eventReminderList);
+//    	event.setReminders(reminder);
+    	    	
+    	if(calendarId != null) new AsyncInsertEvent(this, calendarId, event).execute();
+//    	startDate.setMonth(11);
+//    	if(birthday.getMethod().contains("Email")) {}
+    }
+    
+    private void setSummary(Event event, String name, Boolean isEarly) {
+    	if(isEarly) {
+    		event.setSummary(getStringFromRes(R.string.tomorrow) + name + getStringFromRes(R.string.event_summary));
+    	} else {
+    		event.setSummary(name + getStringFromRes(R.string.event_summary));
+    	}	
+    }
+    
+    private void setRecurrence(Event event, Boolean isLunar, int repeat) {
+    	if(isLunar == false && repeat > 1) {
+    		List<String> recurrenceList = new ArrayList<String>();
+        	recurrenceList.add("RRULE:FREQ=YEARLY;COUNT=" + repeat);
+        	event.setRecurrence(recurrenceList);
+    	} 
+    }
+    
+    private void setStartEndTime(Event event, Date startDate, Boolean isEarly) {
+    	if(isEarly) startDate.setTime(startDate.getTime() - 3600000 * 24);
+    	Date endDate = new Date(startDate.getTime() + 3600000);
+//    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
+    	DateTime start = new DateTime(startDate, TimeZone.getDefault());
+    	event.setStart(new EventDateTime().setDateTime(start).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
+    	DateTime end = new DateTime(endDate, TimeZone.getDefault());
+    	event.setEnd(new EventDateTime().setDateTime(end).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
+    }
+    
+    private void setRemind(Event event, String remindMethod) {
     	List<EventReminder> eventReminderList = new ArrayList<EventReminder>();
-    	String[] method = birthday.getMethod().toLowerCase().split(",");
+    	String[] method = remindMethod.toLowerCase().split(",");
     	for(int i = 0; i < method.length; i++) {
     		Log.d(TAG, "getMethod " + method[i]); 
     		EventReminder eventReminder = new EventReminder();
@@ -288,29 +358,10 @@ public class BirthdayListFragment extends ListFragment {
 			eventReminderList.add(eventReminder);
     	}
     	
-    	Event event = new Event();
-    	event.setSummary(birthday.getName() + getStringFromRes(R.string.event_summary));
-    	
-    	List<String> recurrenceList = new ArrayList<String>();
-    	recurrenceList.add("RRULE:FREQ=YEARLY;COUNT=10");
-    	event.setRecurrence(recurrenceList);
-    	
-    	Date startDate = Util.getFirstDate(birthday.getDate(), birthday.getTime());
-    	Date endDate = new Date(startDate.getTime() + 3600000);
-//    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
-    	DateTime start = new DateTime(startDate, TimeZone.getDefault());
-    	event.setStart(new EventDateTime().setDateTime(start).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
-    	DateTime end = new DateTime(endDate, TimeZone.getDefault());
-    	event.setEnd(new EventDateTime().setDateTime(end).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
-    	
     	Event.Reminders reminder = new Event.Reminders();
     	reminder.setUseDefault(false);
     	reminder.setOverrides(eventReminderList);
-    	event.setReminders(reminder);
-    	    	
-    	if(calendarId != null) new AsyncInsertEvent(this, calendarId, event).execute();
-//    	startDate.setMonth(11);
-//    	if(birthday.getMethod().contains("Email")) {}
+    	event.setReminders(reminder);    	
     }
     
     private String getStringFromRes(int id) {
