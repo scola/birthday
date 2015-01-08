@@ -2,8 +2,12 @@ package io.github.scola.birthday;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.services.samples.calendar.android.AsyncInsertEvent;
 import com.google.api.services.samples.calendar.android.AsyncLoadCalendars;
 import com.google.api.services.samples.calendar.android.CalendarModel;
 
@@ -254,15 +258,58 @@ public class BirthdayListFragment extends ListFragment {
         case REQUEST_NEW_BIRTHDAY:
     	  ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
           for(int i = 0; i < mBirthdays.size(); i++) {
+        	if(mBirthdays.get(i).getName().equals(getResources().getString(R.string.summary_name_preference))) {
+        		continue;
+        	}  
           	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
           		Log.d(TAG, "birthday " + i + " not change " + mSyncedBirthdays.get(i));
-          		continue;
+          		if(mBirthdays.get(i).getEventId() != null && mBirthdays.get(i).getEventId().size() > 0) continue;          		
           	}
-          	Log.d(TAG, "birthday " + i + " changed");
+          	Log.d(TAG, "birthday " + i + " changed");          	
+          	
+          	if(mBirthdays.get(i).getEventId() == null || mBirthdays.get(i).getEventId().size() == 0) {
+          		createEvent(mBirthdays.get(i));
+          	}
           }
 
           break;
       }
+    }
+    
+    private void createEvent(Birthday birthday) {
+    	Log.d(TAG, "createEvent");  
+    	List<EventReminder> eventReminderList = new ArrayList<EventReminder>();
+    	String[] method = birthday.getMethod().toLowerCase().split(",");
+    	for(int i = 0; i < method.length; i++) {
+    		Log.d(TAG, "getMethod " + method[i]); 
+    		EventReminder eventReminder = new EventReminder();
+    		eventReminder.setMethod(method[i].trim());
+			eventReminder.setMinutes(10);
+			eventReminderList.add(eventReminder);
+    	}
+    	
+    	Event event = new Event();
+    	event.setSummary(birthday.getName() + getStringFromRes(R.string.event_summary));
+    	
+    	Date startDate = Util.getFirstDate(birthday.getDate(), birthday.getTime());
+    	Date endDate = new Date(startDate.getTime() + 3600000);
+    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
+    	event.setStart(new EventDateTime().setDateTime(start));
+    	DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
+    	event.setEnd(new EventDateTime().setDateTime(end));
+    	
+    	Event.Reminders reminder = new Event.Reminders();
+    	reminder.setUseDefault(false);
+    	reminder.setOverrides(eventReminderList);
+    	event.setReminders(reminder);
+    	
+    	if(calendarId != null) new AsyncInsertEvent(this, calendarId, event).execute();
+//    	startDate.setMonth(11);
+//    	if(birthday.getMethod().contains("Email")) {}
+    }
+    
+    private String getStringFromRes(int id) {
+    	return getResources().getString(id);
     }
     
     @Override

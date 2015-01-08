@@ -160,8 +160,8 @@ public class Birthday {
 		return mName + " " +
 			   mDate + " " +
 			   mTime + " " +
-			   "isLunar" + isLunar + " " +
-			   "isEarly" + isEarly + " " +
+			   "isLunar " + isLunar + " " +
+			   "isEarly " + isEarly + " " +
 			   mRepeat + " " +
 			   mMethod;
 	}
