@@ -1,6 +1,7 @@
 package io.github.scola.birthday;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +17,9 @@ public class Birthday {
     private static final String JSON_LUNAR = "lunar";
     private static final String JSON_EARLY = "early";
     private static final String JSON_REPEAT = "repeat";
-    private static final String JSON_METHOD = "method";    
+    private static final String JSON_METHOD = "method";  
+    private static final String JSON_SYNC = "sync";
+    private static final String JSON_EVENT = "event";
 	
 	private UUID mId;
 	private String mName;
@@ -27,6 +30,7 @@ public class Birthday {
 	private int mRepeat;
 	private String mMethod;
 	private List<String> mEventId;
+	private Boolean isSync;
 	
     public Birthday() {
         mId = UUID.randomUUID();
@@ -37,6 +41,7 @@ public class Birthday {
         mRepeat = 10;
         mMethod = "Email";
         mEventId = new ArrayList<String>();
+        isSync = false;
     }
     
     public Birthday(Birthday copy) {
@@ -57,7 +62,13 @@ public class Birthday {
         isLunar = json.getBoolean(JSON_LUNAR);
         isEarly = json.getBoolean(JSON_EARLY);
         mRepeat = json.getInt(JSON_REPEAT);
-        mMethod = json.getString(JSON_METHOD);     
+        mMethod = json.getString(JSON_METHOD);   
+        isSync = json.getBoolean(JSON_SYNC);
+        if(json.has(JSON_EVENT)) {
+        	mEventId = Arrays.asList(json.getString(JSON_EVENT).split("|"));
+        } else {
+        	mEventId = new ArrayList<String>();
+        }
         //event id not available
     }
 
@@ -71,6 +82,15 @@ public class Birthday {
         json.put(JSON_EARLY, isEarly);
         json.put(JSON_REPEAT, mRepeat);
         json.put(JSON_METHOD, mMethod);
+        json.put(JSON_SYNC, isSync);
+        if(mEventId != null && mEventId.size() > 0) {
+        	StringBuilder sb = new StringBuilder();
+        	for(int i = 0; i < mEventId.size(); i++) {
+        		if(i == 0) sb.append(mEventId.get(i));
+        		else sb.append("|" + mEventId.get(i));
+        	}
+        	json.put(JSON_EVENT, sb.toString());
+        }
         //event id not available
         return json;
     }
@@ -143,6 +163,14 @@ public class Birthday {
 		return mId;
 	}
 	
+	public Boolean getIsSync() {
+		return isSync;
+	}
+
+	public void setIsSync(Boolean isSync) {
+		this.isSync = isSync;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		Birthday birthday = (Birthday)o;

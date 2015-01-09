@@ -75,7 +75,8 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
     super.onPostExecute(success);
     if (0 == --fragment.numAsyncTasks) {
 //      progressBar.setVisibility(View.GONE);
-    	fragment.getActivity().setProgressBarIndeterminateVisibility(false);
+    	if(fragment.getActivity() != null)
+    		fragment.getActivity().setProgressBarIndeterminateVisibility(false);
     }
     if (success) {
       fragment.refreshView();

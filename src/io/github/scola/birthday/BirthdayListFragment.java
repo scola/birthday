@@ -114,6 +114,19 @@ public class BirthdayListFragment extends ListFragment {
     	if (checkGooglePlayServicesAvailable()) {
     	      haveGooglePlayServices();
     	}
+    	
+    	for(int i = 0; i < mBirthdays.size(); i++) {
+        	if(calendarId == null || mBirthdays.get(i).getIsSync() || mBirthdays.get(i).getName().equals(getResources().getString(R.string.summary_name_preference))) {
+        		continue;
+        	}
+        	
+      		Log.d(TAG, "Start to sync " + i + ": " + mBirthdays.get(i));
+      		if(mBirthdays.get(i).getEventId() != null && mBirthdays.get(i).getEventId().size() > 0) {
+      			//update
+      		} else {
+      			createEvent(mBirthdays.get(i));
+      		}      	
+         }
     }
     
     private void haveGooglePlayServices() {
@@ -256,69 +269,33 @@ public class BirthdayListFragment extends ListFragment {
           }
           break;
         case REQUEST_NEW_BIRTHDAY:
-    	  ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
-          for(int i = 0; i < mBirthdays.size(); i++) {
-        	if(mBirthdays.get(i).getName().equals(getResources().getString(R.string.summary_name_preference))) {
-        		continue;
-        	}  
-          	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
-          		Log.d(TAG, "birthday " + i + " not change " + mSyncedBirthdays.get(i));
-          		if(mBirthdays.get(i).getEventId() != null && mBirthdays.get(i).getEventId().size() > 0) continue;          		
-          	}
-          	Log.d(TAG, "birthday " + i + " changed");          	
-          	
-          	if(mBirthdays.get(i).getEventId() == null || mBirthdays.get(i).getEventId().size() == 0) {
-          		createEvent(mBirthdays.get(i));
-          	}
-          }
+    	    ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
+            for(int i = 0; i < mBirthdays.size(); i++) {
+	          	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
+	          		Log.d(TAG, "birthday " + i + " not change " + mBirthdays.get(i));
+	          		continue;          		
+	          	}
+	          	Log.d(TAG, "birthday " + i + " changed");
+	          	mBirthdays.get(i).setIsSync(false);
+            }
 
-          break;
+         break;
       }
     }
     
     private void createEvent(Birthday birthday) {
     	Log.d(TAG, "createEvent");  
-//    	List<EventReminder> eventReminderList = new ArrayList<EventReminder>();
-//    	String[] method = birthday.getMethod().toLowerCase().split(",");
-//    	for(int i = 0; i < method.length; i++) {
-//    		Log.d(TAG, "getMethod " + method[i]); 
-//    		EventReminder eventReminder = new EventReminder();
-//    		eventReminder.setMethod(method[i].trim());
-//			eventReminder.setMinutes(10);
-//			eventReminderList.add(eventReminder);
-//    	}
-    	
+   	
     	Event event = new Event();
-//    	event.setSummary(birthday.getName() + getStringFromRes(R.string.event_summary));
     	setSummary(event, birthday.getName(), birthday.getIsEarly());
     	setRecurrence(event, birthday.getIsLunar(), birthday.getRepeat());
-    	
-//    	if(birthday.getIsLunar() == false && birthday.getRepeat() > 1) {
-//    		List<String> recurrenceList = new ArrayList<String>();
-//        	recurrenceList.add("RRULE:FREQ=YEARLY;COUNT=" + birthday.getRepeat());
-//        	event.setRecurrence(recurrenceList);
-//    	}    	
 //    	
     	Date startDate = Util.getFirstDate(birthday.getDate(), birthday.getTime());
     	setStartEndTime(event, startDate, birthday.getIsEarly());
     	
     	setRemind(event, birthday.getMethod());
-//    	
-//    	Date endDate = new Date(startDate.getTime() + 3600000);
-////    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
-//    	DateTime start = new DateTime(startDate, TimeZone.getDefault());
-//    	event.setStart(new EventDateTime().setDateTime(start).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
-//    	DateTime end = new DateTime(endDate, TimeZone.getDefault());
-//    	event.setEnd(new EventDateTime().setDateTime(end).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
-//    	
-//    	Event.Reminders reminder = new Event.Reminders();
-//    	reminder.setUseDefault(false);
-//    	reminder.setOverrides(eventReminderList);
-//    	event.setReminders(reminder);
     	    	
-    	if(calendarId != null) new AsyncInsertEvent(this, calendarId, event).execute();
-//    	startDate.setMonth(11);
-//    	if(birthday.getMethod().contains("Email")) {}
+    	if(calendarId != null) new AsyncInsertEvent(this, calendarId, event, birthday).execute();
     }
     
     private void setSummary(Event event, String name, Boolean isEarly) {
@@ -430,6 +407,14 @@ public class BirthdayListFragment extends ListFragment {
     public void refreshView() {
     	
     }
-    
+
+	public ArrayList<Birthday> getBirthdays() {
+		return mBirthdays;
+	}
+
+	public void setBirthdays(ArrayList<Birthday> birthdays) {
+		mBirthdays = birthdays;
+	}   
+        
 }
 
