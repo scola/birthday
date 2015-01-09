@@ -9,6 +9,7 @@ import java.util.TimeZone;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.services.samples.calendar.android.AsyncInsertEvent;
 import com.google.api.services.samples.calendar.android.AsyncLoadCalendars;
+import com.google.api.services.samples.calendar.android.AsyncUpdateEvent;
 import com.google.api.services.samples.calendar.android.CalendarModel;
 
 import io.github.scola.birthday.R;
@@ -123,8 +124,25 @@ public class BirthdayListFragment extends ListFragment {
       		Log.d(TAG, "Start to sync " + i + ": " + mBirthdays.get(i));
       		if(mBirthdays.get(i).getEventId() != null && mBirthdays.get(i).getEventId().size() > 0) {
       			//update
+      			Log.d(TAG, "Start to update " + ": " + mBirthdays.get(i));
+      			if(mBirthdays.get(i).getIsLunar() == false) {
+      				if(mBirthdays.get(i).getEventId().size() == 1){
+      					//just update
+      					createEvent(mBirthdays.get(i), true);
+      				} else {
+      					//remove event
+      					//insert event
+      				}
+      			} else {
+      				if(mBirthdays.get(i).getEventId().size() == mBirthdays.get(i).getRepeat()) {
+      					//just update
+      				} else {
+      					//remove event
+      					//insert event
+      				}
+      			}
       		} else {
-      			createEvent(mBirthdays.get(i));
+      			createEvent(mBirthdays.get(i), false);
       		}      	
          }
     }
@@ -283,8 +301,13 @@ public class BirthdayListFragment extends ListFragment {
       }
     }
     
-    private void createEvent(Birthday birthday) {
-    	Log.d(TAG, "createEvent");  
+    private void updateSolarEvent(Birthday birthday) {
+    	Log.d(TAG, "updateSolarEvent");
+    	Event event = new Event();
+    	setSummary(event, birthday.getName(), birthday.getIsEarly());
+    }
+    private void createEvent(Birthday birthday, Boolean update) {
+    	Log.d(TAG, "createEvent update " + update);  
    	
     	Event event = new Event();
     	setSummary(event, birthday.getName(), birthday.getIsEarly());
@@ -295,7 +318,12 @@ public class BirthdayListFragment extends ListFragment {
     	
     	setRemind(event, birthday.getMethod());
     	    	
-    	if(calendarId != null) new AsyncInsertEvent(this, calendarId, event, birthday).execute();
+    	if(update) {
+    		new AsyncUpdateEvent(this, calendarId, event, birthday).execute();
+    	} else {
+    		new AsyncInsertEvent(this, calendarId, event, birthday).execute();
+    	}
+    		
     }
     
     private void setSummary(Event event, String name, Boolean isEarly) {

@@ -20,6 +20,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import android.os.AsyncTask;
 import android.view.View;
 
+import io.github.scola.birthday.BirthdayLab;
 import io.github.scola.birthday.BirthdayListFragment;
 import io.github.scola.birthday.R;
 
@@ -75,8 +76,10 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
     super.onPostExecute(success);
     if (0 == --fragment.numAsyncTasks) {
 //      progressBar.setVisibility(View.GONE);
-    	if(fragment.getActivity() != null)
-    		fragment.getActivity().setProgressBarIndeterminateVisibility(false);
+    	if(fragment.getActivity() != null) {
+    		fragment.getActivity().setProgressBarIndeterminateVisibility(false); 
+    		BirthdayLab.get(fragment.getActivity()).saveBirthdays();    		
+    	}    	
     }
     if (success) {
       fragment.refreshView();

@@ -13,7 +13,7 @@ import java.io.IOException;
 public class AsyncInsertEvent extends CalendarAsyncTask {
 	private final String calendar_id;
 	private final Event event;
-	Birthday birthday;
+	private final Birthday birthday;
 	private final static String TAG = "AsyncInsertEvent";
 	public AsyncInsertEvent(BirthdayListFragment calendarSample, String calendar_id, Event event, Birthday birthday) {
 	    super(calendarSample);
@@ -26,6 +26,7 @@ public class AsyncInsertEvent extends CalendarAsyncTask {
 	  protected void doInBackground() throws IOException {
 		  Event createEvent = client.events().insert(calendar_id, event).execute();
 		  birthday.getEventId().add(createEvent.getId());
+		  birthday.setIsSync(true);
 		  Log.d(TAG, "create event for " + birthday.getName() + " eventId=" + createEvent.getId());
 	  }
 }
