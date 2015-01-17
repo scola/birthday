@@ -5,6 +5,7 @@ import io.github.scola.birthday.Birthday;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import android.util.Log;
 
@@ -48,6 +49,31 @@ public class Util {
 //		retDate.setHours(hour_minute[0]);
 //		retDate.setMinutes(hour_minute[1]);
 		return remindCalendar.getTime();
+	}
+	
+	public static List<Date> getFirstLunarDate(String date, String time, int repeat) {
+		Calendar currentCalendar = Calendar.getInstance();
+		int year = currentCalendar.get(Calendar.YEAR);
+		int[] month_day = SplitString(date, "-");
+		Calendar cal = IcuCalendarUtil.getCalendarFromLunar(year, month_day[0], month_day[1]);
+		if(cal.compareTo(currentCalendar) < 0) {
+			cal = IcuCalendarUtil.getCalendarFromLunar(++year, month_day[0], month_day[1]);
+		} else {
+			Calendar lastYear = IcuCalendarUtil.getCalendarFromLunar(year - 1, month_day[0], month_day[1]);
+			if(lastYear.compareTo(currentCalendar) >= 0) {
+				cal = lastYear;
+				year--;
+			}
+		}
+		
+		List<Date> dates = new ArrayList<Date>();
+		dates.add(cal.getTime());
+		for(int i = 1; i < repeat; i++) {
+			cal = IcuCalendarUtil.getCalendarFromLunar(++year, month_day[0], month_day[1]);
+			dates.add(cal.getTime());
+		}		
+		
+		return dates;
 	}
 	
 //	public static int[] SplitMethod(String method) {

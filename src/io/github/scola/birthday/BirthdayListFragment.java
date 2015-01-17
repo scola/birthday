@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.services.samples.calendar.android.AsyncBatchInsertEvent;
+import com.google.api.services.samples.calendar.android.AsyncBatchUpdateEvent;
 import com.google.api.services.samples.calendar.android.AsyncInsertEvent;
 import com.google.api.services.samples.calendar.android.AsyncLoadCalendars;
 import com.google.api.services.samples.calendar.android.AsyncUpdateEvent;
@@ -136,13 +138,18 @@ public class BirthdayListFragment extends ListFragment {
       			} else {
       				if(mBirthdays.get(i).getEventId().size() == mBirthdays.get(i).getRepeat()) {
       					//just update
+      					createLunarEvent(mBirthdays.get(i), true);
       				} else {
       					//remove event
       					//insert event
       				}
       			}
       		} else {
-      			createEvent(mBirthdays.get(i), false);
+      			if(mBirthdays.get(i).getIsLunar()) {
+      				createLunarEvent(mBirthdays.get(i), false);
+      			} else {
+      				createEvent(mBirthdays.get(i), false);
+      			}      			
       		}      	
          }
     }
@@ -314,9 +321,9 @@ public class BirthdayListFragment extends ListFragment {
     	setRecurrence(event, birthday.getIsLunar(), birthday.getRepeat());
 //    	
     	Date startDate = Util.getFirstDate(birthday.getDate(), birthday.getTime());
-    	setStartEndTime(event, startDate, birthday.getIsEarly());
+    	setStartEndTime(event, startDate);
     	
-    	setRemind(event, birthday.getMethod());
+    	setRemind(event, birthday.getMethod(), birthday.getIsEarly());
     	    	
     	if(update) {
     		new AsyncUpdateEvent(this, calendarId, event, birthday).execute();
@@ -326,9 +333,33 @@ public class BirthdayListFragment extends ListFragment {
     		
     }
     
+    private void createLunarEvent(Birthday birthday, Boolean update) {
+    	Log.d(TAG, "createLunarEvent update " + update);
+    	
+    	List<Event> eventList = new ArrayList<Event>();    	
+    	//    	
+    	List<Date> startDate = Util.getFirstLunarDate(birthday.getDate(), birthday.getTime(), birthday.getRepeat());
+    	for(Date date : startDate) {
+    		Event event = new Event();
+    		setSummary(event, birthday.getName(), birthday.getIsEarly());
+        	setRecurrence(event, birthday.getIsLunar(), birthday.getRepeat());
+    		setStartEndTime(event, date);
+    		setRemind(event, birthday.getMethod(), birthday.getIsEarly());
+//    		if(update) event.setId(birthday.get)
+    		eventList.add(event);
+    	} 	
+    	    	
+    	if(update) {
+    		new AsyncBatchUpdateEvent(this, calendarId, eventList, birthday).execute();
+    	} else {
+    		new AsyncBatchInsertEvent(this, calendarId, eventList, birthday).execute();
+    	}
+    		
+    }
+    
     private void setSummary(Event event, String name, Boolean isEarly) {
     	if(isEarly) {
-    		event.setSummary(getStringFromRes(R.string.tomorrow) + name + getStringFromRes(R.string.event_summary));
+    		event.setSummary(name + getStringFromRes(R.string.event_summary) + "(" + getStringFromRes(R.string.summary_early_checkbox_preference) + ")");
     	} else {
     		event.setSummary(name + getStringFromRes(R.string.event_summary));
     	}	
@@ -342,8 +373,8 @@ public class BirthdayListFragment extends ListFragment {
     	} 
     }
     
-    private void setStartEndTime(Event event, Date startDate, Boolean isEarly) {
-    	if(isEarly) startDate.setTime(startDate.getTime() - 3600000 * 24);
+    private void setStartEndTime(Event event, Date startDate) {
+//    	if(isEarly) startDate.setTime(startDate.getTime() - 3600000 * 24);
     	Date endDate = new Date(startDate.getTime() + 3600000);
 //    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
     	DateTime start = new DateTime(startDate, TimeZone.getDefault());
@@ -352,14 +383,15 @@ public class BirthdayListFragment extends ListFragment {
     	event.setEnd(new EventDateTime().setDateTime(end).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
     }
     
-    private void setRemind(Event event, String remindMethod) {
+    private void setRemind(Event event, String remindMethod, Boolean isEarly) {
     	List<EventReminder> eventReminderList = new ArrayList<EventReminder>();
     	String[] method = remindMethod.toLowerCase().split(",");
     	for(int i = 0; i < method.length; i++) {
     		Log.d(TAG, "getMethod " + method[i]); 
     		EventReminder eventReminder = new EventReminder();
     		eventReminder.setMethod(method[i].trim());
-			eventReminder.setMinutes(10);
+    		if(isEarly) eventReminder.setMinutes(60 * 24);
+    		else eventReminder.setMinutes(10);
 			eventReminderList.add(eventReminder);
     	}
     	
