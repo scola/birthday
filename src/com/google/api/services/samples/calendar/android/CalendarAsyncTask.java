@@ -72,7 +72,7 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
   }
 
   @Override
-  protected final void onPostExecute(Boolean success) {
+  protected void onPostExecute(Boolean success) {
     super.onPostExecute(success);
     if (0 == --fragment.numAsyncTasks) {
 //      progressBar.setVisibility(View.GONE);

@@ -65,7 +65,7 @@ public class Birthday {
         mMethod = json.getString(JSON_METHOD);   
         isSync = json.getBoolean(JSON_SYNC);
         if(json.has(JSON_EVENT)) {
-        	mEventId = Arrays.asList(json.getString(JSON_EVENT).split("\\|"));
+        	mEventId = new ArrayList<String>(Arrays.asList(json.getString(JSON_EVENT).split("\\|")));
         } else {
         	mEventId = new ArrayList<String>();
         }

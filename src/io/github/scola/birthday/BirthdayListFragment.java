@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.services.samples.calendar.android.AsyncBatchDeleteEvent;
 import com.google.api.services.samples.calendar.android.AsyncBatchInsertEvent;
 import com.google.api.services.samples.calendar.android.AsyncBatchUpdateEvent;
 import com.google.api.services.samples.calendar.android.AsyncInsertEvent;
@@ -133,7 +134,23 @@ public class BirthdayListFragment extends ListFragment {
       					createEvent(mBirthdays.get(i), true);
       				} else {
       					//remove event
+      					Log.d(TAG, "Start to delete the exist event " + i + ": " + mBirthdays.get(i));
+      					new AsyncBatchDeleteEvent(this, calendarId, mBirthdays.get(i), true).execute();
       					//insert event
+//      					new Thread(new Runnable() {      						
+//      		                public void run() {      		                	
+//      		                	while(numAsyncTasks > 0){
+//	      		      				try {
+//		      		  		            Thread.sleep(1000);
+//		      		  		        } catch (InterruptedException e) {
+//		      		  		            throw new RuntimeException(e);
+//		      		  		        }
+//      		                	}              	
+//      		                	
+//      		                }
+//      		            }).start();
+      					
+//      					createEvent(mBirthdays.get(i), false);
       				}
       			} else {
       				if(mBirthdays.get(i).getEventId().size() == mBirthdays.get(i).getRepeat()) {
@@ -141,7 +158,11 @@ public class BirthdayListFragment extends ListFragment {
       					createLunarEvent(mBirthdays.get(i), true);
       				} else {
       					//remove event
+      					Log.d(TAG, "Start to delete the exist event " + i + ": " + mBirthdays.get(i));
+      					new AsyncBatchDeleteEvent(this, calendarId, mBirthdays.get(i), true).execute();
       					//insert event
+//      					createLunarEvent(mBirthdays.get(i), false);
+      					
       				}
       			}
       		} else {
@@ -313,7 +334,7 @@ public class BirthdayListFragment extends ListFragment {
     	Event event = new Event();
     	setSummary(event, birthday.getName(), birthday.getIsEarly());
     }
-    private void createEvent(Birthday birthday, Boolean update) {
+    public void createEvent(Birthday birthday, Boolean update) {
     	Log.d(TAG, "createEvent update " + update);  
    	
     	Event event = new Event();
@@ -333,7 +354,7 @@ public class BirthdayListFragment extends ListFragment {
     		
     }
     
-    private void createLunarEvent(Birthday birthday, Boolean update) {
+    public void createLunarEvent(Birthday birthday, Boolean update) {
     	Log.d(TAG, "createLunarEvent update " + update);
     	
     	List<Event> eventList = new ArrayList<Event>();    	
