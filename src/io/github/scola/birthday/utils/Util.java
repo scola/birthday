@@ -76,6 +76,26 @@ public class Util {
 		return dates;
 	}
 	
+//	public static Date getFirstLunarDate(String date, String time) {
+//		return getFirstLunarDate(date, time, 1).get(0);
+//	}
+	
+	public static long getDayLeft(String date, Boolean isLunar) {
+		Date birthDate;
+		if(isLunar) {
+			birthDate = getFirstLunarDate(date, "00:00", 1).get(0);
+		} else {
+			birthDate = getFirstDate(date, "00:00");
+		}
+		Calendar cal = Calendar.getInstance();
+		Calendar currentCalendar = Calendar.getInstance();
+		cal.setTime(birthDate);
+		long birthdayTime = cal.getTimeInMillis();
+		cal.set(currentCalendar.get(Calendar.YEAR), currentCalendar.get(Calendar.MONTH), currentCalendar.get(Calendar.DAY_OF_MONTH));
+		long todayTime = cal.getTimeInMillis();
+		return (birthdayTime - todayTime)/ (24 * 3600 * 1000);
+	}
+	
 //	public static int[] SplitMethod(String method) {
 //		String
 //		int[] date_time = {0, 0};  

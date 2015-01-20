@@ -468,6 +468,10 @@ public class BirthdayListFragment extends ListFragment {
             titleTextView.setText(c.getName());
             TextView dateTextView =
                 (TextView)convertView.findViewById(R.id.birthday_list_item_dateTextView);
+            TextView dayLeftTextView =
+                    (TextView)convertView.findViewById(R.id.birthday_list_item_dayLeftTextView);
+            
+            dayLeftTextView.setText(Util.getDayLeft(c.getDate(), c.getIsLunar()) + getStringFromRes(R.string.days_left));
             
             dateTextView.setText((c.getIsLunar() ? getResources().getString(R.string.lunar) : getResources().getString(R.string.solar)) + " " + c.getDate());
 
