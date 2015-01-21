@@ -40,7 +40,7 @@ public class AsyncInsertCalendar extends CalendarAsyncTask {
 
   @Override
   protected void doInBackground() throws IOException {
-    Calendar calendar = client.calendars().insert(entry).setFields(CalendarInfo.FIELDS).execute();
+    Calendar calendar = client.calendars().insert(entry).setFields("id,summary").execute();
     SharedPreferences lunarBirthdayCalendarId = fragment.getActivity().getPreferences(Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = lunarBirthdayCalendarId.edit();
     editor.putString(fragment.PREF_GOOGLE_CALENDAR_ID, calendar.getId());

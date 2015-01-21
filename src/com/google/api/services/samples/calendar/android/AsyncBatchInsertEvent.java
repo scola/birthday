@@ -10,9 +10,7 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.client.http.HttpHeaders;
 
 import io.github.scola.birthday.Birthday;
-import io.github.scola.birthday.BirthdayLab;
 import io.github.scola.birthday.BirthdayListFragment;
-import io.github.scola.birthday.BirthdayListFragment.BirthdayAdapter;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,10 +46,6 @@ public class AsyncBatchInsertEvent extends CalendarAsyncTask {
                 public void onSuccess(Event event, HttpHeaders headers) {
                     birthday.getEventId().add(event.getId());
                     Log.d(TAG, "create event for " + birthday.getName() + " eventId=" + event.getId());
-                    if(birthday.getRepeat() == birthday.getEventId().size()) {
-                    	birthday.setIsSync(true);
-                    }
-                    //model.add(event);
                 }
 
                 @Override
@@ -66,6 +60,7 @@ public class AsyncBatchInsertEvent extends CalendarAsyncTask {
       @Override
       protected final void onPostExecute(Boolean success) {
         super.onPostExecute(success);
-        fragment.getSyncingBirthdays().remove(birthday);     
+        fragment.getSyncingBirthdays().remove(birthday);
+        if(success) birthday.setIsSync(true);
       }
 }

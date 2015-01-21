@@ -19,7 +19,6 @@ public class AsyncBatchUpdateEvent extends CalendarAsyncTask {
 	private final String calendar_id;
 	private final List<Event> events;
 	private final Birthday birthday;
-	private int eventSize;
 	private final static String TAG = "AsyncBatchUpdateEvent";
 	
 	public AsyncBatchUpdateEvent(BirthdayListFragment calendarSample, String calendar_id, List<Event> events, Birthday birthday) {
@@ -27,16 +26,7 @@ public class AsyncBatchUpdateEvent extends CalendarAsyncTask {
 	    this.calendar_id = calendar_id;
 	    this.events = events;
 	    this.birthday = birthday;
-	    this.eventSize = birthday.getEventId().size();
 	  }
-	
-//	  @Override
-//	  protected void doInBackground() throws IOException {
-//		  Event createEvent = client.events().insert(calendar_id, event).execute();
-//		  birthday.getEventId().add(createEvent.getId());
-//		  birthday.setIsSync(true);
-//		  Log.d(TAG, "create event for " + birthday.getName() + " eventId=" + createEvent.getId());
-//	  }
       
       @Override
       protected void doInBackground() throws IOException {
@@ -47,11 +37,11 @@ public class AsyncBatchUpdateEvent extends CalendarAsyncTask {
 
                 public void onSuccess(Event event, HttpHeaders headers) {
                     Log.d(TAG, "update event for " + birthday.getName() + " eventId=" + event.getId());
-                    eventSize--;
-                    if(eventSize == 0) {
-                    	birthday.setIsSync(true);
-                    }
-                    //model.add(event);
+//                    eventSize--;
+//                    if(eventSize == 0) {
+//                    	birthday.setIsSync(true);
+//                    }
+//                    //model.add(event);
                 }
 
                 @Override
@@ -66,6 +56,7 @@ public class AsyncBatchUpdateEvent extends CalendarAsyncTask {
       @Override
       protected final void onPostExecute(Boolean success) {
         super.onPostExecute(success);
-        fragment.getSyncingBirthdays().remove(birthday);     
+        fragment.getSyncingBirthdays().remove(birthday);
+        if(success) birthday.setIsSync(true);
       }
 }

@@ -17,7 +17,6 @@ package com.google.api.services.samples.calendar.android;
 import android.util.Log;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.Event;
 
 import io.github.scola.birthday.Birthday;
@@ -48,23 +47,20 @@ public class AsyncUpdateEvent extends CalendarAsyncTask {
   @Override
   protected void doInBackground() throws IOException {
     try {
-    	Event updatedEvent = client.events().update(calendarId, birthday.getEventId().get(0), event).execute();
-//    	birthday.getEventId().remove(0);
-//    	birthday.getEventId().add(updatedEvent.getId());
-		birthday.setIsSync(true);
+    	Event updatedEvent = client.events().update(calendarId, birthday.getEventId().get(0), event).execute();		
 		Log.d(TAG, "update event for " + birthday.getName() + " eventId=" + updatedEvent.getId());
     } catch (GoogleJsonResponseException e) {
       // 404 Not Found would happen if user tries to delete an already deleted calendar
       if (e.getStatusCode() != 404) {
         throw e;
       }
-//      model.remove(calendarId);
     }
   }
   
   @Override
   protected final void onPostExecute(Boolean success) {
     super.onPostExecute(success);
-    fragment.getSyncingBirthdays().remove(birthday);     
+    fragment.getSyncingBirthdays().remove(birthday);
+    if(success) birthday.setIsSync(true);
   }
 }

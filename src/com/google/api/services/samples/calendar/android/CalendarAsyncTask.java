@@ -18,11 +18,9 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlaySe
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 
 import android.os.AsyncTask;
-import android.view.View;
 
 import io.github.scola.birthday.BirthdayLab;
 import io.github.scola.birthday.BirthdayListFragment;
-import io.github.scola.birthday.R;
 
 import java.io.IOException;
 
@@ -35,13 +33,11 @@ import java.io.IOException;
 abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
   final BirthdayListFragment fragment;
-  final CalendarModel model;
   final com.google.api.services.calendar.Calendar client;
 //  private final View progressBar;
 
   CalendarAsyncTask(BirthdayListFragment fragment) {
     this.fragment = fragment;
-    model = fragment.model;
     client = fragment.client;
 //    progressBar = fragment.getListView().findViewById(R.id.title_refresh_progress);
   }

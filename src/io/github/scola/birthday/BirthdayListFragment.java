@@ -13,7 +13,6 @@ import com.google.api.services.samples.calendar.android.AsyncBatchUpdateEvent;
 import com.google.api.services.samples.calendar.android.AsyncInsertEvent;
 import com.google.api.services.samples.calendar.android.AsyncLoadCalendars;
 import com.google.api.services.samples.calendar.android.AsyncUpdateEvent;
-import com.google.api.services.samples.calendar.android.CalendarModel;
 
 import io.github.scola.birthday.R;
 import io.github.scola.birthday.utils.Util;
@@ -44,7 +43,6 @@ import android.accounts.AccountManager;
 import android.view.ActionMode;
 import android.widget.AbsListView.MultiChoiceModeListener;
 
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
@@ -76,7 +74,6 @@ public class BirthdayListFragment extends ListFragment {
 	public static final int REQUEST_NEW_BIRTHDAY = 3;
 
 	public int numAsyncTasks;
-	public CalendarModel model = new CalendarModel();
 	public com.google.api.services.calendar.Calendar client;
 	
 	public final String PREF_GOOGLE_CALENDAR_ID = "calendarId";

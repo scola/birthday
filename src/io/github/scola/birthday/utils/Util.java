@@ -58,11 +58,16 @@ public class Util {
 				year--;
 			}
 		}
+		int[] hour_minute = SplitString(time, ":");
+		cal.set(Calendar.HOUR_OF_DAY, hour_minute[0]);
+		cal.set(Calendar.MINUTE, hour_minute[1]);
 		
 		List<Date> dates = new ArrayList<Date>();
 		dates.add(cal.getTime());
 		for(int i = 1; i < repeat; i++) {
 			cal = IcuCalendarUtil.getCalendarFromLunar(++year, month_day[0], month_day[1]);
+			cal.set(Calendar.HOUR_OF_DAY, hour_minute[0]);
+			cal.set(Calendar.MINUTE, hour_minute[1]);
 			dates.add(cal.getTime());
 		}		
 		

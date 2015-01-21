@@ -2,8 +2,6 @@
 <resources>
 
   <string name="app_name">Birthday</string>
-  <string name="crime_title_hint">Enter a title for this crime.</string>
-  <string name="crime_title_label">Title</string> 
   
     <string name="title_name_preference">Name</string>
     <string name="summary_name_preference">Whose birthday</string>    
