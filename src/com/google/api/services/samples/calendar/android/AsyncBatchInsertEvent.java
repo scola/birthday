@@ -10,7 +10,9 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.client.http.HttpHeaders;
 
 import io.github.scola.birthday.Birthday;
+import io.github.scola.birthday.BirthdayLab;
 import io.github.scola.birthday.BirthdayListFragment;
+import io.github.scola.birthday.BirthdayListFragment.BirthdayAdapter;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,5 +61,11 @@ public class AsyncBatchInsertEvent extends CalendarAsyncTask {
               });
         }
         batch.execute();
+      }
+      
+      @Override
+      protected final void onPostExecute(Boolean success) {
+        super.onPostExecute(success);
+        fragment.getSyncingBirthdays().remove(birthday);     
       }
 }

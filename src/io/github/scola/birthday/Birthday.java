@@ -192,6 +192,6 @@ public class Birthday {
 			   "isEarly " + isEarly + " " +
 			   mRepeat + " " +
 			   mMethod + " " + 
-			   isSync;
+			   "isSync " + isSync;
 	}
 }

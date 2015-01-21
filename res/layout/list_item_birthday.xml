@@ -11,11 +11,11 @@
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:ellipsize="marquee"
     android:fadingEdge="horizontal"
-    android:textSize="20sp"
+    android:textSize="22sp"
     android:paddingLeft="4dp"
     android:paddingRight="4dp"
-    android:paddingTop="20dp"
-    android:paddingBottom="20dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     android:text="birthday name" />
   <TextView android:id="@+id/birthday_list_item_dateTextView"
     android:layout_width="wrap_content"
@@ -27,8 +27,8 @@
     android:textSize="15sp"
     android:paddingLeft="4dp"
     android:paddingRight="4dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="5dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="2dp"
     android:text="birthday date" />
   <TextView android:id="@+id/birthday_list_item_dayLeftTextView"
     android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
     android:textSize="15sp"
     android:paddingLeft="4dp"
     android:paddingRight="4dp"
-    android:paddingTop="5dp"
-    android:paddingBottom="10dp"
+    android:paddingTop="2dp"
+    android:paddingBottom="5dp"
     android:text="@string/days_left" />
 </RelativeLayout>

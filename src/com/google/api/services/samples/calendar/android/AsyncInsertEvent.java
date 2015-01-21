@@ -29,4 +29,10 @@ public class AsyncInsertEvent extends CalendarAsyncTask {
 		  birthday.setIsSync(true);
 		  Log.d(TAG, "create event for " + birthday.getName() + " eventId=" + createEvent.getId());
 	  }
+	  
+	  @Override
+      protected final void onPostExecute(Boolean success) {
+        super.onPostExecute(success);
+        fragment.getSyncingBirthdays().remove(birthday);     
+      }
 }

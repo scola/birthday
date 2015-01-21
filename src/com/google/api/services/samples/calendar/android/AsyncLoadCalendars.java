@@ -14,6 +14,8 @@
 
 package com.google.api.services.samples.calendar.android;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.api.services.calendar.model.CalendarList;
@@ -40,8 +42,12 @@ public class AsyncLoadCalendars extends CalendarAsyncTask {
     CalendarList feed = client.calendarList().list().setFields(CalendarInfo.FEED_FIELDS).execute();
     for (CalendarListEntry calendar : feed.getItems()) {
     	if(calendar.getSummary().equals("Lunar Birthday") && fragment.calendarId == null) {
-    		Log.d(TAG, "Lunar Birthday calendar already exist");
+    		Log.d(TAG, "Lunar Birthday calendar already exist:" + calendar.getId());
     		fragment.calendarId = calendar.getId();
+    		SharedPreferences lunarBirthdayCalendarId = fragment.getActivity().getPreferences(Context.MODE_PRIVATE);
+    	    SharedPreferences.Editor editor = lunarBirthdayCalendarId.edit();
+    	    editor.putString(fragment.PREF_GOOGLE_CALENDAR_ID, calendar.getId());
+    	    editor.commit();
     	}
     }
     

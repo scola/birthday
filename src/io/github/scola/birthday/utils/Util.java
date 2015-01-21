@@ -36,19 +36,11 @@ public class Util {
 		int year = currentCalendar.get(Calendar.YEAR);
 		int[] hour_minute = SplitString(time, ":");
 		remindCalendar.set(year, month_day[0] - 1, month_day[1], hour_minute[0], hour_minute[1]);
-//		Date retDate = new Date();
+
 		if(remindCalendar.compareTo(currentCalendar) < 0) {
 			remindCalendar.set(Calendar.YEAR, year + 1);
-//			retDate.setYear(year + 1);
 		}
 		Log.d(TAG, "current year " + year);
-////		retDate.setYear(year);
-//		retDate.setMonth(month_day[0]);
-//		retDate.setDate(month_day[1]);
-//		
-//		int[] hour_minute = SplitString(time, ":");
-//		retDate.setHours(hour_minute[0]);
-//		retDate.setMinutes(hour_minute[1]);
 		return remindCalendar.getTime();
 	}
 	
@@ -77,16 +69,12 @@ public class Util {
 		return dates;
 	}
 	
-//	public static Date getFirstLunarDate(String date, String time) {
-//		return getFirstLunarDate(date, time, 1).get(0);
-//	}
-	
 	public static long getDayLeft(String date, Boolean isLunar) {
 		Date birthDate;
 		if(isLunar) {
-			birthDate = getFirstLunarDate(date, "00:00", 1).get(0);
+			birthDate = getFirstLunarDate(date, "12:00", 1).get(0);
 		} else {
-			birthDate = getFirstDate(date, "00:00");
+			birthDate = getFirstDate(date, "12:00");
 		}
 		Calendar cal = Calendar.getInstance();
 		Calendar currentCalendar = Calendar.getInstance();
@@ -96,12 +84,4 @@ public class Util {
 		long todayTime = cal.getTimeInMillis();
 		return (birthdayTime - todayTime)/ (24 * 3600 * 1000);
 	}
-	
-//	public static int[] SplitMethod(String method) {
-//		String
-//		int[] date_time = {0, 0};  
-////		date_time[0] = Integer.parseInt(summary.split(sep)[0]);
-////		date_time[1] = Integer.parseInt(summary.split(sep)[1]);
-//		return date_time;
-//	}
 }

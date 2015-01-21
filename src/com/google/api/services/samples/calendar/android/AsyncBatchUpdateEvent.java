@@ -62,4 +62,10 @@ public class AsyncBatchUpdateEvent extends CalendarAsyncTask {
         }
         batch.execute();
       }
+      
+      @Override
+      protected final void onPostExecute(Boolean success) {
+        super.onPostExecute(success);
+        fragment.getSyncingBirthdays().remove(birthday);     
+      }
 }

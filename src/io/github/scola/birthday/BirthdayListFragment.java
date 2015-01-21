@@ -92,8 +92,7 @@ public class BirthdayListFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-//        getActivity().requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        Log.d(TAG, "onCreate");
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.birthdays_title);
         mBirthdays = BirthdayLab.get(getActivity()).getBirthdays();
@@ -109,6 +108,7 @@ public class BirthdayListFragment extends ListFragment {
         client = new com.google.api.services.calendar.Calendar.Builder(
             transport, jsonFactory, credential).setApplicationName("Google-CalendarAndroidSample/1.0")
             .build();
+        calendarId = settings.getString(PREF_GOOGLE_CALENDAR_ID, null);
     }
     
     @Override
@@ -171,10 +171,11 @@ public class BirthdayListFragment extends ListFragment {
         if (credential.getSelectedAccountName() == null) {
             // ask user to choose account
             chooseAccount();
-        } else {
-            // load calendars
-        	if(calendarId == null) AsyncLoadCalendars.run(this);
-//        	createNewCalendar();
+        } else {        	
+        	if(calendarId == null) {
+        		Log.d(TAG, "AsyncLoadCalendars");
+        		AsyncLoadCalendars.run(this);
+        	}
         }
     }
     
@@ -319,7 +320,8 @@ public class BirthdayListFragment extends ListFragment {
 
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {                
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {  
+    	Log.d(TAG, "onActivityResult");
         switch (requestCode) {
         case REQUEST_GOOGLE_PLAY_SERVICES:
           if (resultCode == Activity.RESULT_OK) {
@@ -513,8 +515,13 @@ public class BirthdayListFragment extends ListFragment {
             TextView dayLeftTextView =
                     (TextView)convertView.findViewById(R.id.birthday_list_item_dayLeftTextView);
             
-            dayLeftTextView.setText(Util.getDayLeft(c.getDate(), c.getIsLunar()) + getStringFromRes(R.string.days_left));
-            
+            long dayLeft = Util.getDayLeft(c.getDate(), c.getIsLunar());
+            String dayLeftString = dayLeft + getStringFromRes(R.string.days_left);
+            if(dayLeft == 0) {
+            	dayLeftString = getStringFromRes(R.string.today);
+            }            
+
+            dayLeftTextView.setText(dayLeftString);            
             dateTextView.setText((c.getIsLunar() ? getResources().getString(R.string.lunar) : getResources().getString(R.string.solar)) + " " + c.getDate());
 
             return convertView;
@@ -550,5 +557,10 @@ public class BirthdayListFragment extends ListFragment {
 	public void setDeleteBirthdays(ArrayList<Birthday> mdeleteBirthdays) {
 		this.mdeleteBirthdays = mdeleteBirthdays;
 	}
+
+	public ArrayList<Birthday> getSyncingBirthdays() {
+		return mSyncingBirthdays;
+	}	
+	
 }
 

@@ -61,4 +61,10 @@ public class AsyncUpdateEvent extends CalendarAsyncTask {
 //      model.remove(calendarId);
     }
   }
+  
+  @Override
+  protected final void onPostExecute(Boolean success) {
+    super.onPostExecute(success);
+    fragment.getSyncingBirthdays().remove(birthday);     
+  }
 }

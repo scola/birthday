@@ -13,7 +13,7 @@
     <string name="summary_time_preference">12:00</string>
     
     <string name="title_date_preference">Birthday</string>
-    <string name="summary_date_preference">06-08</string>
+    <string name="summary_date_preference">06&#8211;08</string>
     <string name="dialog_title_date_preference">Set birthday</string>
     
     <string name="title_lunar_preference">Lunar</string>
@@ -63,7 +63,8 @@
     <string name="alert_no_cancel">Cancel</string>
     
     <string name="wait_for_delete_finish">Waiting for delete complete</string>
-    <string name="delete_now">Deleting on google calendar, please wait a while</string>   
+    <string name="delete_now">Deleting on google calendar, please wait&#8230;</string>   
+    <string name="today">Today</string>   
     
     
     
