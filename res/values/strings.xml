@@ -57,6 +57,14 @@
     <string name="tomorrow">Tomorrow is&#160;</string>
     <string name="days_left">&#160;days left</string>
     
+    <string name="confirm_for_delete">Delete the birthday?</string>
+    <string name="delete_alert_msg">After delete the birthday on google calendar, the birthday will be deleted.Are you sure to delete?</string>
+    <string name="alert_yes_delete">Delete</string>
+    <string name="alert_no_cancel">Cancel</string>
+    
+    <string name="wait_for_delete_finish">Waiting for delete complete</string>
+    <string name="delete_now">Deleting on google calendar, please wait a while</string>   
+    
     
     
     

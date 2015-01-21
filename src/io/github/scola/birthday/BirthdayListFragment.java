@@ -19,8 +19,10 @@ import io.github.scola.birthday.R;
 import io.github.scola.birthday.utils.Util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -33,18 +35,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.accounts.AccountManager;
 
 import android.view.ActionMode;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -63,15 +61,16 @@ import com.google.api.services.samples.calendar.android.AsyncInsertCalendar;
 
 public class BirthdayListFragment extends ListFragment {
 	
-	private static final String PREF_ACCOUNT_NAME = "accountName";
-	
+	private static final String PREF_ACCOUNT_NAME = "accountName";	
 	
 	public static final String TAG = "BirthdayListFragment";
 	
     private ArrayList<Birthday> mBirthdays;
     private ArrayList<Birthday> mSyncedBirthdays;
+    private ArrayList<Birthday> mdeleteBirthdays;
+    private ArrayList<Birthday> mSyncingBirthdays;
     
-    public static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
+	public static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
 	public static final int REQUEST_AUTHORIZATION = 1;
 	public static final int REQUEST_ACCOUNT_PICKER = 2;
 	public static final int REQUEST_NEW_BIRTHDAY = 3;
@@ -98,6 +97,7 @@ public class BirthdayListFragment extends ListFragment {
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.birthdays_title);
         mBirthdays = BirthdayLab.get(getActivity()).getBirthdays();
+        mSyncingBirthdays = new ArrayList<Birthday>();
         BirthdayAdapter adapter = new BirthdayAdapter(mBirthdays);
         setListAdapter(adapter);
         setRetainInstance(true);
@@ -120,10 +120,11 @@ public class BirthdayListFragment extends ListFragment {
     	}
     	
     	for(int i = 0; i < mBirthdays.size(); i++) {
-        	if(calendarId == null || mBirthdays.get(i).getIsSync() || mBirthdays.get(i).getName().equals(getResources().getString(R.string.summary_name_preference))) {
+        	if(calendarId == null || mBirthdays.get(i).getIsSync() || mBirthdays.get(i).getName().equals(getResources().getString(R.string.summary_name_preference)) ||
+        			mSyncingBirthdays.contains(mBirthdays.get(i))) {
         		continue;
         	}
-        	
+        	mSyncingBirthdays.add(mBirthdays.get(i));
       		Log.d(TAG, "Start to sync " + i + ": " + mBirthdays.get(i));
       		if(mBirthdays.get(i).getEventId() != null && mBirthdays.get(i).getEventId().size() > 0) {
       			//update
@@ -134,23 +135,8 @@ public class BirthdayListFragment extends ListFragment {
       					createEvent(mBirthdays.get(i), true);
       				} else {
       					//remove event
-      					Log.d(TAG, "Start to delete the exist event " + i + ": " + mBirthdays.get(i));
+      					Log.d(TAG, "Start to delete the exist event and update " + i + ": " + mBirthdays.get(i));
       					new AsyncBatchDeleteEvent(this, calendarId, mBirthdays.get(i), true).execute();
-      					//insert event
-//      					new Thread(new Runnable() {      						
-//      		                public void run() {      		                	
-//      		                	while(numAsyncTasks > 0){
-//	      		      				try {
-//		      		  		            Thread.sleep(1000);
-//		      		  		        } catch (InterruptedException e) {
-//		      		  		            throw new RuntimeException(e);
-//		      		  		        }
-//      		                	}              	
-//      		                	
-//      		                }
-//      		            }).start();
-      					
-//      					createEvent(mBirthdays.get(i), false);
       				}
       			} else {
       				if(mBirthdays.get(i).getEventId().size() == mBirthdays.get(i).getRepeat()) {
@@ -158,11 +144,9 @@ public class BirthdayListFragment extends ListFragment {
       					createLunarEvent(mBirthdays.get(i), true);
       				} else {
       					//remove event
-      					Log.d(TAG, "Start to delete the exist event " + i + ": " + mBirthdays.get(i));
+      					Log.d(TAG, "Start to delete the exist event and update " + i + ": " + mBirthdays.get(i));
       					new AsyncBatchDeleteEvent(this, calendarId, mBirthdays.get(i), true).execute();
-      					//insert event
-//      					createLunarEvent(mBirthdays.get(i), false);
-      					
+
       				}
       			}
       		} else {
@@ -173,6 +157,13 @@ public class BirthdayListFragment extends ListFragment {
       			}      			
       		}      	
          }
+    }
+    
+    @Override
+    public void onStop() {
+    	super.onStop();
+    	Log.d(TAG, "onResume");
+    	BirthdayLab.get(getActivity()).saveBirthdays();
     }
     
     private void haveGooglePlayServices() {
@@ -239,13 +230,20 @@ public class BirthdayListFragment extends ListFragment {
                 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.menu_item_delete_birthday:
+                        	if(mdeleteBirthdays != null && mdeleteBirthdays.size() > 0) {
+                        		Toast.makeText(getActivity(), getStringFromRes(R.string.wait_for_delete_finish),
+            							Toast.LENGTH_SHORT).show();
+                        		return true;
+                        	}
                             BirthdayAdapter adapter = (BirthdayAdapter)getListAdapter();
-                            BirthdayLab birthdayLab = BirthdayLab.get(getActivity());
+//                            BirthdayLab birthdayLab = BirthdayLab.get(getActivity());
+                            mdeleteBirthdays = new ArrayList<Birthday>();
                             for (int i = adapter.getCount() - 1; i >= 0; i--) {
                                 if (getListView().isItemChecked(i)) {
-                                    birthdayLab.deleteBirthday(adapter.getItem(i));
+                                	mdeleteBirthdays.add(adapter.getItem(i));
                                 }
                             }
+                            deleteItemAndPopAlert();
                             mode.finish(); 
                             adapter.notifyDataSetChanged();
                             return true;
@@ -268,8 +266,46 @@ public class BirthdayListFragment extends ListFragment {
         return v;
     }
     
+    private void deleteItemAndPopAlert() {
+    	new AlertDialog.Builder(getActivity())
+//        .setIcon(android.R.drawable.ic_dialog_alert)
+        .setTitle(R.string.confirm_for_delete)
+        .setMessage(R.string.delete_alert_msg)
+        .setPositiveButton(R.string.alert_yes_delete, new DialogInterface.OnClickListener() {
+//            @Override
+            public void onClick(DialogInterface dialog, int which) {  	
+            	if(mdeleteBirthdays == null || mdeleteBirthdays.size() == 0) return;
+                for (Birthday birthday : mdeleteBirthdays) {
+                	if(calendarId != null && birthday.getEventId().size() > 0) {
+                		new AsyncBatchDeleteEvent(BirthdayListFragment.this, calendarId, birthday, false).execute();
+                		Toast.makeText(getActivity(), getStringFromRes(R.string.delete_now),
+            					Toast.LENGTH_LONG).show();
+                	}               		
+                	else {
+                		BirthdayLab.get(getActivity()).deleteBirthday(birthday);
+                		mdeleteBirthdays.remove(birthday);
+                		((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
+                	}
+                }
+                
+            }
+
+        })
+        .setNegativeButton(R.string.alert_no_cancel, new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int which) {
+        		mdeleteBirthdays.clear();
+        	}
+        })
+        .show();
+    }
+    
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) { 
+    public void onListItemClick(ListView l, View v, int position, long id) {
+    	if(mdeleteBirthdays != null && mdeleteBirthdays.size() > 0) {
+    		Toast.makeText(getActivity(), getStringFromRes(R.string.wait_for_delete_finish),
+					Toast.LENGTH_SHORT).show();
+    		return;
+    	}
         Birthday c = (Birthday)(getListAdapter()).getItem(position);
         mSyncedBirthdays = Util.cloneList(mBirthdays);
         //mSyncedBirthdays = (ArrayList<Birthday>)mBirthdays.clone();
@@ -329,11 +365,11 @@ public class BirthdayListFragment extends ListFragment {
       }
     }
     
-    private void updateSolarEvent(Birthday birthday) {
-    	Log.d(TAG, "updateSolarEvent");
-    	Event event = new Event();
-    	setSummary(event, birthday.getName(), birthday.getIsEarly());
-    }
+//    private void updateSolarEvent(Birthday birthday) {
+//    	Log.d(TAG, "updateSolarEvent");
+//    	Event event = new Event();
+//    	setSummary(event, birthday.getName(), birthday.getIsEarly());
+//    }
     public void createEvent(Birthday birthday, Boolean update) {
     	Log.d(TAG, "createEvent update " + update);  
    	
@@ -436,6 +472,12 @@ public class BirthdayListFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_new_birthday:
+            	if(mdeleteBirthdays != null && mdeleteBirthdays.size() > 0) {
+            		Toast.makeText(getActivity(), getStringFromRes(R.string.wait_for_delete_finish),
+							Toast.LENGTH_SHORT).show();
+            		return true;
+            	}
+            	mSyncedBirthdays = Util.cloneList(mBirthdays);
                 Birthday birthday = new Birthday();
                 BirthdayLab.get(getActivity()).addBirthday(birthday);
                 Intent i = new Intent(getActivity(), BirthdayActivity.class);
@@ -447,7 +489,7 @@ public class BirthdayListFragment extends ListFragment {
         } 
     }
     
-    private class BirthdayAdapter extends ArrayAdapter<Birthday> {
+    public class BirthdayAdapter extends ArrayAdapter<Birthday> {
         public BirthdayAdapter(ArrayList<Birthday> Birthdays) {
             super(getActivity(), android.R.layout.simple_list_item_1, Birthdays);
         }
@@ -500,6 +542,13 @@ public class BirthdayListFragment extends ListFragment {
 	public void setBirthdays(ArrayList<Birthday> birthdays) {
 		mBirthdays = birthdays;
 	}   
-        
+    
+    public ArrayList<Birthday> getDeleteBirthdays() {
+		return mdeleteBirthdays;
+	}
+
+	public void setDeleteBirthdays(ArrayList<Birthday> mdeleteBirthdays) {
+		this.mdeleteBirthdays = mdeleteBirthdays;
+	}
 }
 

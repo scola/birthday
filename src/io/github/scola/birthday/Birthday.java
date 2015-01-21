@@ -191,6 +191,7 @@ public class Birthday {
 			   "isLunar " + isLunar + " " +
 			   "isEarly " + isEarly + " " +
 			   mRepeat + " " +
-			   mMethod;
+			   mMethod + " " + 
+			   isSync;
 	}
 }

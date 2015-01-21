@@ -21,6 +21,7 @@ public class Util {
 	
 	public static ArrayList<Birthday> cloneList(ArrayList<Birthday> list) {
 		ArrayList<Birthday> clone = new ArrayList<Birthday>();
+		if(list == null || list.size() == 0) return null;
 		for (Birthday birthday : list) {
 			Birthday birth = new Birthday(birthday);
 			clone.add(birth);

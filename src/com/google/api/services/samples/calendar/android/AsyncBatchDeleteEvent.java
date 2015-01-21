@@ -12,9 +12,9 @@ import com.google.api.client.http.HttpHeaders;
 import io.github.scola.birthday.Birthday;
 import io.github.scola.birthday.BirthdayLab;
 import io.github.scola.birthday.BirthdayListFragment;
+import io.github.scola.birthday.BirthdayListFragment.BirthdayAdapter;
 
 import java.io.IOException;
-import java.util.List;
 
 public class AsyncBatchDeleteEvent extends CalendarAsyncTask {
 	private final String calendar_id;
@@ -70,6 +70,10 @@ public class AsyncBatchDeleteEvent extends CalendarAsyncTask {
         	} else {
         		fragment.createEvent(birthday, false);
         	}
+        } else {
+        	BirthdayLab.get(fragment.getActivity()).deleteBirthday(birthday);
+        	((BirthdayAdapter)(fragment.getListAdapter())).notifyDataSetChanged();
+        	fragment.getDeleteBirthdays().remove(birthday);
         }
       }
 }
