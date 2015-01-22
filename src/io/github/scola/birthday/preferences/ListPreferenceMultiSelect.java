@@ -1,9 +1,7 @@
 package io.github.scola.birthday.preferences;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -12,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ListView;
 
 import io.github.scola.birthday.R;

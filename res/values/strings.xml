@@ -55,13 +55,13 @@
     <string name="tomorrow">Tomorrow is&#160;</string>
     <string name="days_left">&#160;days left</string>
     
-    <string name="confirm_for_delete">Delete the birthday?</string>
-    <string name="delete_alert_msg">After delete the birthday on google calendar, the birthday will be deleted.Are you sure to delete?</string>
+    <string name="confirm_for_delete">Delete the birthday</string>
+    <string name="delete_alert_msg">After delete the birthday on google calendar, the birthday will be deleted.Are you sure to delete</string>
     <string name="alert_yes_delete">Delete</string>
     <string name="alert_no_cancel">Cancel</string>
     
     <string name="wait_for_delete_finish">Waiting for delete complete</string>
-    <string name="delete_now">Deleting on google calendar, please wait&#8230;</string>   
+    <string name="delete_now">Deleting on google calendar, please wait</string>   
     <string name="today">Today</string>   
     <string name="about">ABOUT</string>
     
@@ -71,9 +71,9 @@
     <string name="about_info_title">Birthday %s</string>
     <string name="about_info_share">Share</string>
     <string name="share_content">
-        Start Wi-Fi hotspot on you android device,you can invite other people who connect your Wi-FI to twitter.Please try this App twittrouter http://crater.herokuapp.com/uploads/twittrouter.apk
+        Birthday is used to sync chinese lunar birthday to google calendar, because google calendar cannot set recurring events by lunar date. Please try it https://play.google.com/store/apps/details?id=io.github.scola.birthday
     </string>
-    <string name="share_subject">Invite your friends to twitter</string>
+    <string name="share_subject">Invite to use Birthday app for google calendar</string>
     <string name="share_channel">Share via</string>
     <string name="about_info_close">Close</string>
     

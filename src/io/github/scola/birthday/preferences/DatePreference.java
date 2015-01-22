@@ -5,7 +5,6 @@ import io.github.scola.birthday.utils.Util;
 import java.lang.reflect.Field;
 
 import android.annotation.TargetApi;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
