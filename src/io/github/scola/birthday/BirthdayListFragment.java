@@ -169,7 +169,7 @@ public class BirthdayListFragment extends ListFragment {
             // ask user to choose account
             chooseAccount();
         } else {        	
-        	if(calendarId == null) {
+        	if(calendarId == null && numAsyncTasks == 0) {
         		Log.d(TAG, "AsyncLoadCalendars");
         		AsyncLoadCalendars.run(this);
         	}
@@ -337,7 +337,7 @@ public class BirthdayListFragment extends ListFragment {
           break;
         case REQUEST_AUTHORIZATION:
           if (resultCode == Activity.RESULT_OK) {
-        	  if(calendarId == null) AsyncLoadCalendars.run(this);
+        	  if(calendarId == null && numAsyncTasks == 0) AsyncLoadCalendars.run(this);
 //        	  createNewCalendar();
           } else {
             chooseAccount();
@@ -352,7 +352,7 @@ public class BirthdayListFragment extends ListFragment {
               SharedPreferences.Editor editor = settings.edit();
               editor.putString(PREF_ACCOUNT_NAME, accountName);
               editor.commit();
-              if(calendarId == null) AsyncLoadCalendars.run(this);
+              if(calendarId == null && numAsyncTasks == 0) AsyncLoadCalendars.run(this);
 //              createNewCalendar();
             }
           }
