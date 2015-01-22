@@ -44,21 +44,33 @@ public class BirthdayPagerActivity extends FragmentActivity {
 
             public void onPageSelected(int position) {
                 // Check if this is the page you want.
-            	String name = birthdays.get(position).getName();
-                if(name != null && false == name.equals(getResources().getString(R.string.summary_name_preference))){
-                	setTitle(name + getResources().getString(R.string.event_summary));
-                }
-                else {
-                	setTitle(R.string.birthdays_title);
-                }
+//            	String name = birthdays.get(position).getName();
+//                if(name != null && false == name.equals(getResources().getString(R.string.summary_name_preference))){
+//                	setTitle(name + getResources().getString(R.string.event_summary));
+//                }
+//                else {
+//                	setTitle(R.string.birthdays_title);
+//                }
+            	setBirthdayTitle(birthdays, position);
             }
         });
         UUID birthdayId = (UUID)getIntent().getSerializableExtra(BirthdayFragment.EXTRA_BIRTHDAY_ID);
         for (int i = 0; i < birthdays.size(); i++) {
             if (birthdays.get(i).getId().equals(birthdayId)) {
                 mViewPager.setCurrentItem(i);
+                setBirthdayTitle(birthdays, i);
                 break;
             } 
+        }
+    }
+    
+    private void setBirthdayTitle(ArrayList<Birthday> birthdays, int i) {
+    	String name = birthdays.get(i).getName();
+        if(name != null && false == name.equals(getResources().getString(R.string.summary_name_preference))){
+        	setTitle(name + getResources().getString(R.string.event_summary));
+        }
+        else {
+        	setTitle(R.string.birthdays_title);
         }
     }
 }

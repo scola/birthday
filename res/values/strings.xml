@@ -67,7 +67,14 @@
     
     <string name="select_items">%1$d items selected</string>
     
-    
-    
+    <string name="about_page">file:///android_asset/pages/about-en.html</string>
+    <string name="about_info_title">Birthday %s</string>
+    <string name="about_info_share">Share</string>
+    <string name="share_content">
+        Start Wi-Fi hotspot on you android device,you can invite other people who connect your Wi-FI to twitter.Please try this App twittrouter http://crater.herokuapp.com/uploads/twittrouter.apk
+    </string>
+    <string name="share_subject">Invite your friends to twitter</string>
+    <string name="share_channel">Share via</string>
+    <string name="about_info_close">Close</string>
     
 </resources>

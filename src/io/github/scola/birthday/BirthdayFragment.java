@@ -4,8 +4,14 @@ import java.util.UUID;
 
 import io.github.scola.birthday.R;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -16,6 +22,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class BirthdayFragment extends PreferenceFragment 
 				implements OnSharedPreferenceChangeListener{
@@ -192,18 +200,64 @@ public class BirthdayFragment extends PreferenceFragment
                 NavUtils.navigateUpFromSameTask(getActivity());
                 return true;
             case R.id.menu_item_about:
+            	openAbout();
             	return true;
             default:
                 return super.onOptionsItemSelected(item);
         } 
     }
     
-/*
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.xml.preferences, parent, false);
-        
-        return v; 
+    public static String getMyVersion(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            if (null == packageInfo.versionName) {
+                return "Unknown";
+            } else {
+                return packageInfo.versionName;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "failed to get package info" + e);
+            return "Unknown";
+        }
     }
-*/    
+    
+    private void openAbout() {
+        WebView web = new WebView(getActivity());
+        web.loadUrl(_(R.string.about_page));
+        web.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                return true;
+            }
+        });
+        new AlertDialog.Builder(getActivity())
+                .setTitle(String.format(_(R.string.about_info_title), getMyVersion(getActivity())))
+                .setCancelable(false)
+                .setPositiveButton(R.string.about_info_share, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, _(R.string.share_subject));                       
+                        intent.putExtra(Intent.EXTRA_TEXT, _(R.string.share_content));
+                        startActivity(Intent.createChooser(intent, _(R.string.share_channel)));
+                    }
+                })
+                .setNegativeButton(R.string.about_info_close, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .setView(web)
+                .create()
+                .show();        
+    }
+    
+    private String _(int id) {
+        return getResources().getString(id);
+    }
+  
 }
