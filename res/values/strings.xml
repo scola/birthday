@@ -63,6 +63,9 @@
     <string name="wait_for_delete_finish">Waiting for delete complete</string>
     <string name="delete_now">Deleting on google calendar, please wait&#8230;</string>   
     <string name="today">Today</string>   
+    <string name="about">ABOUT</string>
+    
+    <string name="select_items">%1$d items selected</string>
     
     
     

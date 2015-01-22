@@ -13,6 +13,8 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class BirthdayFragment extends PreferenceFragment 
@@ -46,7 +48,8 @@ public class BirthdayFragment extends PreferenceFragment
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);       
+        Log.d(TAG, "onCreate");
         //mBirthday = new Birthday();
         addPreferencesFromResource(R.xml.preferences);
         UUID birthdayId = (UUID)getArguments().getSerializable(EXTRA_BIRTHDAY_ID);
@@ -55,6 +58,7 @@ public class BirthdayFragment extends PreferenceFragment
         if(mBirthday.getName() == null) {
         	mBirthday.setName(getResources().getString(R.string.summary_name_preference));
         }
+
         preference.setSummary(mBirthday.getName());
         
         preference = findPreference(KEY_DATE_PREFERENCE);
@@ -89,6 +93,7 @@ public class BirthdayFragment extends PreferenceFragment
     public void onResume(){
         super.onResume();
         // Set up a listener whenever a key changes
+        Log.d(TAG, "onResume");
         getPreferenceScreen().getSharedPreferences()
             .registerOnSharedPreferenceChangeListener(this);
         //updatePreference(KEY_EDIT_TEXT_PREFERENCE);
@@ -97,6 +102,7 @@ public class BirthdayFragment extends PreferenceFragment
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause");
         // Unregister the listener whenever a key changes
         getPreferenceScreen().getSharedPreferences()
             .unregisterOnSharedPreferenceChangeListener(this);        
@@ -173,6 +179,11 @@ public class BirthdayFragment extends PreferenceFragment
 
     }
 	
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.birthday_about_page, menu);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -180,6 +191,8 @@ public class BirthdayFragment extends PreferenceFragment
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(getActivity());
                 return true;
+            case R.id.menu_item_about:
+            	return true;
             default:
                 return super.onOptionsItemSelected(item);
         } 

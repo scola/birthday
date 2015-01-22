@@ -214,7 +214,6 @@ public class BirthdayListFragment extends ListFragment {
         } else {
             listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
             listView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-            
                 public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                     MenuInflater inflater = mode.getMenuInflater();
                     inflater.inflate(R.menu.birthday_list_item_context, menu);
@@ -223,6 +222,15 @@ public class BirthdayListFragment extends ListFragment {
             
                 public void onItemCheckedStateChanged(ActionMode mode, int position,
                         long id, boolean checked) {
+                	BirthdayAdapter adapter = (BirthdayAdapter)getListAdapter();
+                	int selectCount = 0;
+                    for (int i = adapter.getCount() - 1; i >= 0; i--) {
+                        if (getListView().isItemChecked(i)) {
+                        	selectCount++;
+                        }
+                    }
+                	String titleText = String.format(getStringFromRes(R.string.select_items), selectCount);
+                	mode.setTitle(titleText);
                 }
             
                 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -242,7 +250,7 @@ public class BirthdayListFragment extends ListFragment {
                                 }
                             }
                             deleteItemAndPopAlert();
-                            mode.finish(); 
+                            mode.finish();
                             adapter.notifyDataSetChanged();
                             return true;
                         default:
