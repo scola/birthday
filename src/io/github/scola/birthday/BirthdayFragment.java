@@ -153,8 +153,19 @@ public class BirthdayFragment extends PreferenceFragment
     }
 	
 	private void updatePreference(String key){
-//		Log.d(TAG, "Preference changed");
-//        Preference preference = findPreference(key);
+		Log.d(TAG, "Preference changed");
+//		if (key.equals(KEY_NAME_PREFERENCE)) {
+//			EditTextPreference preference = (EditTextPreference)findPreference(key);
+//			String name = preference.getText().toString().trim();
+//			Log.d(TAG, "setName when input name: " + name);
+//			if(name != null && false == name.equals(getResources().getString(R.string.summary_name_preference))){
+//				getActivity().setTitle(name + getResources().getString(R.string.event_summary));
+//	        }
+//	        else {
+//	        	getActivity().setTitle(R.string.birthdays_title);
+//	        }
+//		} 
+        
 //        if (preference instanceof CheckBoxPreference){
 //        	CheckBoxPreference checkBoxPreference =  (CheckBoxPreference)preference;
 //            Boolean isChecked = checkBoxPreference.isChecked();
