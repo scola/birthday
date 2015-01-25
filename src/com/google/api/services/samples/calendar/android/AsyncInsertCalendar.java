@@ -16,6 +16,7 @@ package com.google.api.services.samples.calendar.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.api.services.calendar.model.Calendar;
 
@@ -30,7 +31,7 @@ import java.io.IOException;
  * @author Yaniv Inbar
  */
 public class AsyncInsertCalendar extends CalendarAsyncTask {
-
+  private static final String TAG = "AsyncInsertCalendar";
   private final Calendar entry;
 
   public AsyncInsertCalendar(BirthdayListFragment calendarSample, Calendar entry) {
@@ -40,7 +41,8 @@ public class AsyncInsertCalendar extends CalendarAsyncTask {
 
   @Override
   protected void doInBackground() throws IOException {
-    Calendar calendar = client.calendars().insert(entry).setFields("id,summary").execute();
+    Calendar calendar = client.calendars().insert(entry).setFields("id,summary,timeZone").execute();
+    Log.d(TAG, "calendar timeZone:" + calendar.getTimeZone());
     SharedPreferences lunarBirthdayCalendarId = fragment.getActivity().getPreferences(Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = lunarBirthdayCalendarId.edit();
     editor.putString(fragment.PREF_GOOGLE_CALENDAR_ID, calendar.getId());

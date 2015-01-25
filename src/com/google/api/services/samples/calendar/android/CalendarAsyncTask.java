@@ -30,7 +30,7 @@ import java.io.IOException;
  * 
  * @author Yaniv Inbar
  */
-abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
+public abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
   final BirthdayListFragment fragment;
   final com.google.api.services.calendar.Calendar client;
@@ -46,6 +46,7 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
   protected void onPreExecute() {
     super.onPreExecute();
     fragment.numAsyncTasks++;
+    fragment.mAyncTaskList.add(this);
 //    progressBar.setVisibility(View.VISIBLE);
     fragment.getActivity().setProgressBarIndeterminateVisibility(true);
   }
@@ -62,7 +63,7 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
       fragment.startActivityForResult(
           userRecoverableException.getIntent(), BirthdayListFragment.REQUEST_AUTHORIZATION);
     } catch (IOException e) {
-      Utils.logAndShow(fragment, BirthdayListFragment.TAG, e);
+      if(!fragment.isRemoving() || !fragment.isCancelAyncTasks()) Utils.logAndShow(fragment, BirthdayListFragment.TAG, e);
     }
     return false;
   }
@@ -80,6 +81,20 @@ abstract class CalendarAsyncTask extends AsyncTask<Void, Void, Boolean> {
     if (success) {
       fragment.refreshView();
     }
+    fragment.mAyncTaskList.remove(this);
+  }
+  
+  @Override
+  protected void onCancelled(Boolean success) {
+	  super.onCancelled(success);
+	    if (0 == --fragment.numAsyncTasks) {
+//	      progressBar.setVisibility(View.GONE);
+	    	if(fragment.getActivity() != null) {
+	    		fragment.getActivity().setProgressBarIndeterminateVisibility(false); 
+	    		BirthdayLab.get(fragment.getActivity()).saveBirthdays();    		
+	    	}    	
+	    }
+	    fragment.mAyncTaskList.remove(this);
   }
 
   abstract protected void doInBackground() throws IOException;

@@ -46,6 +46,7 @@ public class AsyncBatchUpdateEvent extends CalendarAsyncTask {
 
                 @Override
                 public void onFailure(GoogleJsonError err, HttpHeaders headers) throws IOException {
+                  if(fragment.isCancelAyncTasks()) return;
                   Utils.logAndShowError(fragment, TAG, err.getMessage());
                 }
               });

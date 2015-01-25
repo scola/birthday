@@ -34,12 +34,13 @@ public class AsyncBatchDeleteEvent extends CalendarAsyncTask {
     	Log.d(TAG, "delete the event" + ": " + birthday);
         BatchRequest batch = client.batch();
         try {
-            for (String eventId : birthday.getEventId()) {
+            for (String eventId : birthday.getEventId()) {              
               client.events().delete(calendar_id, eventId)
                   .queue(batch, new JsonBatchCallback<Void>(){                	  
 
                     @Override
                     public void onFailure(GoogleJsonError err, HttpHeaders headers) throws IOException {
+                      if(fragment.isCancelAyncTasks()) return;	
                       Utils.logAndShowError(fragment, TAG, err.getMessage());
                     }
 
@@ -51,6 +52,10 @@ public class AsyncBatchDeleteEvent extends CalendarAsyncTask {
 					}
                   });
             }
+//            if(fragment.isCancelAyncTasks()) {
+//            	cancel(true);
+//            	return;
+//            }
             batch.execute();
         } catch (GoogleJsonResponseException e) {
             if (e.getStatusCode() != 404) {

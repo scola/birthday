@@ -13,6 +13,7 @@ import com.google.api.services.samples.calendar.android.AsyncBatchUpdateEvent;
 import com.google.api.services.samples.calendar.android.AsyncInsertEvent;
 import com.google.api.services.samples.calendar.android.AsyncLoadCalendars;
 import com.google.api.services.samples.calendar.android.AsyncUpdateEvent;
+import com.google.api.services.samples.calendar.android.CalendarAsyncTask;
 
 import io.github.scola.birthday.R;
 import io.github.scola.birthday.utils.Util;
@@ -60,6 +61,8 @@ import com.google.api.services.samples.calendar.android.AsyncInsertCalendar;
 public class BirthdayListFragment extends ListFragment {
 	
 	private static final String PREF_ACCOUNT_NAME = "accountName";	
+	private String mGoogleAccount;
+	private String mTimeZone;
 	
 	public static final String TAG = "BirthdayListFragment";
 	
@@ -68,15 +71,19 @@ public class BirthdayListFragment extends ListFragment {
     private ArrayList<Birthday> mdeleteBirthdays;
     private ArrayList<Birthday> mSyncingBirthdays;
     
+    public ArrayList<CalendarAsyncTask> mAyncTaskList;
+    
 	public static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
 	public static final int REQUEST_AUTHORIZATION = 1;
 	public static final int REQUEST_ACCOUNT_PICKER = 2;
 	public static final int REQUEST_NEW_BIRTHDAY = 3;
 
 	public int numAsyncTasks;
+	public boolean mCancelAyncTasks = false;
 	public com.google.api.services.calendar.Calendar client;
 	
 	public final String PREF_GOOGLE_CALENDAR_ID = "calendarId";
+	public final String PREF_GOOGLE_CALENDAR_TIMEZONE = "timeZone";
 	
 	final HttpTransport transport = AndroidHttp.newCompatibleTransport();
 	
@@ -100,12 +107,15 @@ public class BirthdayListFragment extends ListFragment {
         
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Collections.singleton(CalendarScopes.CALENDAR));
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-        credential.setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+        mGoogleAccount = settings.getString(PREF_ACCOUNT_NAME, null);
+        mTimeZone = settings.getString(PREF_GOOGLE_CALENDAR_TIMEZONE, null);
+        credential.setSelectedAccountName(mGoogleAccount);
         // Calendar client
         client = new com.google.api.services.calendar.Calendar.Builder(
             transport, jsonFactory, credential).setApplicationName("Google-CalendarAndroidSample/1.0")
             .build();
         calendarId = settings.getString(PREF_GOOGLE_CALENDAR_ID, null);
+        mAyncTaskList = new ArrayList<CalendarAsyncTask>();
     }
     
     @Override
@@ -159,9 +169,24 @@ public class BirthdayListFragment extends ListFragment {
     @Override
     public void onStop() {
     	super.onStop();
-    	Log.d(TAG, "onResume");
+    	Log.d(TAG, "onStop()");
+    	mCancelAyncTasks = true;
     	BirthdayLab.get(getActivity()).saveBirthdays();
+    	if(mAyncTaskList.size() > 0) {
+    		for(CalendarAsyncTask asyncTask : mAyncTaskList) {
+    			Log.d(TAG, "asyncTask is canceling...");
+    			asyncTask.cancel(true);
+    		}
+    	}
+    	mSyncingBirthdays.clear();
     }
+    
+//    @Override
+//    public void onDetach() {
+//    	super.onDetach();
+//    	Log.d(TAG, "onDetach()");
+//    	getActivity().finish();
+//    }
     
     private void haveGooglePlayServices() {
         // check if there is already an account selected
@@ -191,12 +216,13 @@ public class BirthdayListFragment extends ListFragment {
     }
     
     public void createNewCalendar() {
-    	if(calendarId != null) return;
+    	if(calendarId != null || mCancelAyncTasks) return;
     	SharedPreferences lunarBirthdayCalendarId = getActivity().getPreferences(Context.MODE_PRIVATE);
     	calendarId = lunarBirthdayCalendarId.getString(PREF_GOOGLE_CALENDAR_ID, null);
     	if(calendarId == null) {
     		Calendar calendar = new Calendar();
         	calendar.setSummary("Lunar Birthday");
+        	calendar.setTimeZone(mTimeZone);
         	new AsyncInsertCalendar(this, calendar).execute();
     	}
     }
@@ -352,6 +378,7 @@ public class BirthdayListFragment extends ListFragment {
               SharedPreferences.Editor editor = settings.edit();
               editor.putString(PREF_ACCOUNT_NAME, accountName);
               editor.commit();
+              mGoogleAccount = accountName;
               if(calendarId == null && numAsyncTasks == 0) AsyncLoadCalendars.run(this);
 //              createNewCalendar();
             }
@@ -378,8 +405,7 @@ public class BirthdayListFragment extends ListFragment {
 //    	setSummary(event, birthday.getName(), birthday.getIsEarly());
 //    }
     public void createEvent(Birthday birthday, Boolean update) {
-    	Log.d(TAG, "createEvent update " + update);  
-   	
+    	Log.d(TAG, "createEvent update " + update);
     	Event event = new Event();
     	setSummary(event, birthday.getName(), birthday.getIsEarly());
     	setRecurrence(event, birthday.getIsLunar(), birthday.getRepeat());
@@ -399,7 +425,6 @@ public class BirthdayListFragment extends ListFragment {
     
     public void createLunarEvent(Birthday birthday, Boolean update) {
     	Log.d(TAG, "createLunarEvent update " + update);
-    	
     	List<Event> eventList = new ArrayList<Event>();    	
     	//    	
     	List<Date> startDate = Util.getFirstLunarDate(birthday.getDate(), birthday.getTime(), birthday.getRepeat());
@@ -441,10 +466,10 @@ public class BirthdayListFragment extends ListFragment {
 //    	if(isEarly) startDate.setTime(startDate.getTime() - 3600000 * 24);
     	Date endDate = new Date(startDate.getTime() + 3600000);
 //    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
-    	DateTime start = new DateTime(startDate, TimeZone.getDefault());
-    	event.setStart(new EventDateTime().setDateTime(start).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
-    	DateTime end = new DateTime(endDate, TimeZone.getDefault());
-    	event.setEnd(new EventDateTime().setDateTime(end).setTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)));
+    	DateTime start = new DateTime(startDate, TimeZone.getTimeZone(mTimeZone));
+    	event.setStart(new EventDateTime().setDateTime(start).setTimeZone(mTimeZone));
+    	DateTime end = new DateTime(endDate, TimeZone.getTimeZone(mTimeZone));
+    	event.setEnd(new EventDateTime().setDateTime(end).setTimeZone(mTimeZone));
     }
     
     private void setRemind(Event event, String remindMethod, Boolean isEarly) {
@@ -565,6 +590,18 @@ public class BirthdayListFragment extends ListFragment {
 
 	public ArrayList<Birthday> getSyncingBirthdays() {
 		return mSyncingBirthdays;
+	}
+
+	public String getGoogleAccount() {
+		return mGoogleAccount;
+	}
+
+	public void setTimeZone(String mTimeZone) {
+		this.mTimeZone = mTimeZone;
+	}
+
+	public boolean isCancelAyncTasks() {
+		return mCancelAyncTasks;
 	}	
 	
 }

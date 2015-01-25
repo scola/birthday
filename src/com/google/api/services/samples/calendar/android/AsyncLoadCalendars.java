@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Yaniv Inbar
  */
 public class AsyncLoadCalendars extends CalendarAsyncTask {
-	public static final String TAG = "AsyncLoadCalendars";
+	private static final String TAG = "AsyncLoadCalendars";
 
   AsyncLoadCalendars(BirthdayListFragment calendarSample) {
     super(calendarSample);
@@ -39,21 +39,29 @@ public class AsyncLoadCalendars extends CalendarAsyncTask {
 
   @Override
   protected void doInBackground() throws IOException {
-    CalendarList feed = client.calendarList().list().setFields("items(id,summary)").execute();
+    CalendarList feed = client.calendarList().list().setFields("items(id,summary,timeZone)").execute();
+    String timeZone = "Asia/Shanghai";
     for (CalendarListEntry calendar : feed.getItems()) {
+    	Log.d(TAG, "return calendar summary:" + calendar.getSummary() + " timeZone:" + calendar.getTimeZone());
     	if(calendar.getSummary().equals("Lunar Birthday") && fragment.calendarId == null) {
     		Log.d(TAG, "Lunar Birthday calendar already exist:" + calendar.getId());
     		fragment.calendarId = calendar.getId();
-    		SharedPreferences lunarBirthdayCalendarId = fragment.getActivity().getPreferences(Context.MODE_PRIVATE);
-    	    SharedPreferences.Editor editor = lunarBirthdayCalendarId.edit();
-    	    editor.putString(fragment.PREF_GOOGLE_CALENDAR_ID, calendar.getId());
-    	    editor.commit();
+    	}
+    	if(calendar.getSummary().equals(fragment.getGoogleAccount())) {
+    		if(calendar.getTimeZone() != null) timeZone = calendar.getTimeZone();
+    		fragment.setTimeZone(timeZone);
+    		Log.d(TAG, "get google account timeZone:" + calendar.getTimeZone());
     	}
     }
-    
+	SharedPreferences lunarBirthdayCalendarId = fragment.getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = lunarBirthdayCalendarId.edit();
     if(fragment.calendarId == null) {
     	fragment.createNewCalendar();
-    }
+    } else {
+	    editor.putString(fragment.PREF_GOOGLE_CALENDAR_ID, fragment.calendarId);	    
+    }    
+    editor.putString(fragment.PREF_GOOGLE_CALENDAR_TIMEZONE, timeZone);
+    editor.commit();
 //    model.reset(feed.getItems());
   }
 
