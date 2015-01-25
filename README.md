@@ -1,7 +1,8 @@
 农历生日 for Google calendar
 =======================
 农历生日是用来同步农历生日到google日历, 因为google日历不能创建农历重复事件.
-此App本身不具有任何提醒功能.
+此App本身不具有任何提醒功能.  
+
 [![Google Play](http://developer.android.com/images/brand/en_generic_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=io.github.scola.birthday)
 
 How to build
