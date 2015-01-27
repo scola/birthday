@@ -61,6 +61,7 @@
     <string name="alert_no_cancel">Cancel</string>
     
     <string name="wait_for_delete_finish">Waiting for delete complete</string>
+    <string name="wait_for_sync_finish">Waiting for sync complete</string>
     <string name="delete_now">Deleting on google calendar, please wait</string>   
     <string name="today">Today</string>   
     <string name="about">ABOUT</string>

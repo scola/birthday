@@ -3,6 +3,7 @@ package io.github.scola.birthday;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -267,6 +268,11 @@ public class BirthdayListFragment extends ListFragment {
             							Toast.LENGTH_SHORT).show();
                         		return true;
                         	}
+                        	if(numAsyncTasks > 0) {
+                        		Toast.makeText(getActivity(), getStringFromRes(R.string.wait_for_sync_finish),
+            							Toast.LENGTH_SHORT).show();
+                        		return true;
+                        	}
                             BirthdayAdapter adapter = (BirthdayAdapter)getListAdapter();
 //                            BirthdayLab birthdayLab = BirthdayLab.get(getActivity());
                             mdeleteBirthdays = new ArrayList<Birthday>();
@@ -307,7 +313,8 @@ public class BirthdayListFragment extends ListFragment {
 //            @Override
             public void onClick(DialogInterface dialog, int which) {  	
             	if(mdeleteBirthdays == null || mdeleteBirthdays.size() == 0) return;
-                for (Birthday birthday : mdeleteBirthdays) {
+            	for(Iterator<Birthday> it = mdeleteBirthdays.iterator(); it.hasNext(); ) {
+            		Birthday birthday = it.next();
                 	if(calendarId != null && birthday.getEventId().size() > 0) {
                 		new AsyncBatchDeleteEvent(BirthdayListFragment.this, calendarId, birthday, false).execute();
                 		Toast.makeText(getActivity(), getStringFromRes(R.string.delete_now),
@@ -315,7 +322,7 @@ public class BirthdayListFragment extends ListFragment {
                 	}               		
                 	else {
                 		BirthdayLab.get(getActivity()).deleteBirthday(birthday);
-                		mdeleteBirthdays.remove(birthday);
+                		it.remove();
                 		((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
                 	}
                 }

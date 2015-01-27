@@ -56,12 +56,13 @@
     <string name="days_left">&#160;天后</string>
     
     <string name="confirm_for_delete">删除生日</string>
-    <string name="delete_alert_msg">在google日历中删除之后,选中的生日才会删除,确定要删除么</string>
+    <string name="delete_alert_msg">在Google日历中删除之后,选中的生日才会删除,确定要删除么</string>
     <string name="alert_yes_delete">删除</string>
     <string name="alert_no_cancel">取消</string>
     
     <string name="wait_for_delete_finish">等待删除完成</string>
-    <string name="delete_now">正在google日历中删除,请稍等</string>   
+    <string name="wait_for_sync_finish">等待同步完成,请稍后再删</string>
+    <string name="delete_now">正在Google日历中删除,请稍等</string>   
     <string name="today">今天</string>   
     <string name="about">关于</string>
     
@@ -71,7 +72,7 @@
     <string name="about_info_title">农历生日 %s</string>
     <string name="about_info_share">分享</string>
     <string name="share_content">
-        农历生日是用来同步农历生日到google日历, 因为google日历不能创建农历重复事件. 下载地址  https://play.google.com/store/apps/details?id=io.github.scola.birthday
+        农历生日是用来同步农历生日到Google日历, 因为Google日历不能创建农历重复事件. 下载地址  https://play.google.com/store/apps/details?id=io.github.scola.birthday
     </string>
     <string name="share_subject">邀请你使用农历生日</string>
     <string name="share_channel">分享通过</string>
