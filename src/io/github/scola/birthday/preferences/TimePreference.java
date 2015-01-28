@@ -33,8 +33,8 @@ public class TimePreference extends DialogPreference {
     public TimePreference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);      
         
-        setPositiveButtonText(ctxt.getResources().getString(android.R.string.ok));
-        setNegativeButtonText(ctxt.getResources().getString(android.R.string.cancel));
+//        setPositiveButtonText(ctxt.getResources().getString(android.R.string.ok));
+//        setNegativeButtonText(ctxt.getResources().getString(android.R.string.cancel));
     }
 
     @Override
