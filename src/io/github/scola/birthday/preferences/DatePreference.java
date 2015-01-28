@@ -34,8 +34,8 @@ public class DatePreference extends DialogPreference {
     public DatePreference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);      
 
-        setPositiveButtonText("Set");
-        setNegativeButtonText("Cancel");
+        setPositiveButtonText(ctxt.getResources().getString(android.R.string.ok));
+        setNegativeButtonText(ctxt.getResources().getString(android.R.string.cancel));
     }
     
     @Override
