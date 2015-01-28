@@ -35,39 +35,58 @@ public class Util {
 		int[] month_day = SplitString(date, "-");
 		int year = currentCalendar.get(Calendar.YEAR);
 		int[] hour_minute = SplitString(time, ":");
-		remindCalendar.set(year, month_day[0] - 1, month_day[1], hour_minute[0], hour_minute[1]);
+		remindCalendar.set(year, month_day[0] - 1, month_day[1]);
 
 		if(remindCalendar.compareTo(currentCalendar) < 0) {
 			remindCalendar.set(Calendar.YEAR, year + 1);
 		}
 		Log.d(TAG, "current year " + year);
+		remindCalendar.set(Calendar.HOUR_OF_DAY, hour_minute[0]);
+		remindCalendar.set(Calendar.MINUTE, hour_minute[1]);
 		return remindCalendar.getTime();
 	}
 	
 	public static List<Date> getFirstLunarDate(String date, String time, int repeat) {
 		Calendar currentCalendar = Calendar.getInstance();
-		int year = currentCalendar.get(Calendar.YEAR);
+		
+		Solar today = new Solar();
+		today.solarYear = currentCalendar.get(Calendar.YEAR);
+		today.solarMonth = currentCalendar.get(Calendar.MONTH) + 1;
+		today.solarDay = currentCalendar.get(Calendar.DAY_OF_MONTH);
+		
 		int[] month_day = SplitString(date, "-");
-		Calendar cal = IcuCalendarUtil.getCalendarFromLunar(year, month_day[0], month_day[1]);
-		if(cal.compareTo(currentCalendar) < 0) {
-			cal = IcuCalendarUtil.getCalendarFromLunar(++year, month_day[0], month_day[1]);
+		Lunar lunar = new Lunar();
+		lunar.isleap = false;
+		lunar.lunarYear = today.solarYear;
+		lunar.lunarMonth = month_day[0];
+		lunar.lunarDay = month_day[1];
+		Solar solar = LunarSolarConverter.LunarToSolar(lunar);
+		
+		if(compareDate(solar, today) < 0) {
+			lunar.lunarYear++;
+			solar = LunarSolarConverter.LunarToSolar(lunar);
 		} else {
-			Calendar lastYear = IcuCalendarUtil.getCalendarFromLunar(year - 1, month_day[0], month_day[1]);
-			if(lastYear.compareTo(currentCalendar) >= 0) {
-				cal = lastYear;
-				year--;
-			}
+			lunar.lunarYear--;
+			Solar lastYear = LunarSolarConverter.LunarToSolar(lunar);
+			if(compareDate(lastYear, today) < 0) lunar.lunarYear++;
+			else solar = lastYear;
 		}
+		
 		int[] hour_minute = SplitString(time, ":");
+		Calendar cal = Calendar.getInstance();
+		cal.set(solar.solarYear, solar.solarMonth - 1, solar.solarDay);
 		cal.set(Calendar.HOUR_OF_DAY, hour_minute[0]);
 		cal.set(Calendar.MINUTE, hour_minute[1]);
 		
 		List<Date> dates = new ArrayList<Date>();
 		dates.add(cal.getTime());
 		for(int i = 1; i < repeat; i++) {
-			cal = IcuCalendarUtil.getCalendarFromLunar(++year, month_day[0], month_day[1]);
+			lunar.lunarYear++;
+			solar = LunarSolarConverter.LunarToSolar(lunar);
+			cal.set(solar.solarYear, solar.solarMonth - 1, solar.solarDay);
 			cal.set(Calendar.HOUR_OF_DAY, hour_minute[0]);
 			cal.set(Calendar.MINUTE, hour_minute[1]);
+			
 			dates.add(cal.getTime());
 		}		
 		
@@ -88,5 +107,14 @@ public class Util {
 		cal.set(currentCalendar.get(Calendar.YEAR), currentCalendar.get(Calendar.MONTH), currentCalendar.get(Calendar.DAY_OF_MONTH));
 		long todayTime = cal.getTimeInMillis();
 		return (birthdayTime - todayTime)/ (24 * 3600 * 1000);
+	}
+	
+	public static int compareDate(Solar solar, Solar today) {
+		if(solar.solarYear < today.solarYear) return -1;
+		if(solar.solarYear > today.solarYear || solar.solarMonth > today.solarMonth) return 1;
+		if(solar.solarMonth == today.solarMonth && solar.solarDay > today.solarDay) return 1;
+		if(solar.solarYear == today.solarYear && solar.solarMonth == today.solarMonth && solar.solarDay == today.solarDay)			
+			return 0;
+		return -1;
 	}
 }
