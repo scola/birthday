@@ -127,6 +127,7 @@ public class BirthdayListFragment extends ListFragment {
     	      haveGooglePlayServices();
     	}
     	
+    	((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
     	for(int i = 0; i < mBirthdays.size(); i++) {
         	if(calendarId == null || mBirthdays.get(i).getIsSync() || mBirthdays.get(i).getName().equals(getResources().getString(R.string.summary_name_preference)) ||
         			mSyncingBirthdays.contains(mBirthdays.get(i))) {
@@ -391,8 +392,7 @@ public class BirthdayListFragment extends ListFragment {
             }
           }
           break;
-        case REQUEST_NEW_BIRTHDAY:
-    	    ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
+        case REQUEST_NEW_BIRTHDAY:    	    
             for(int i = 0; i < mBirthdays.size(); i++) {
 	          	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
 	          		Log.d(TAG, "birthday " + i + " not change " + mBirthdays.get(i));
