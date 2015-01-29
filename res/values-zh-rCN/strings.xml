@@ -56,13 +56,13 @@
     <string name="days_left">&#160;天后</string>
     
     <string name="confirm_for_delete">删除生日</string>
-    <string name="delete_alert_msg">在Google日历中删除之后,选中的生日才会删除,确定要删除么</string>
+    <string name="delete_alert_msg">在Google日历中删除之后, 选中的生日才会删除, 确定要删除么</string>
     <string name="alert_yes_delete">删除</string>
     <string name="alert_no_cancel">取消</string>
     
     <string name="wait_for_delete_finish">等待删除完成</string>
-    <string name="wait_for_sync_finish">等待同步完成,请稍后再删</string>
-    <string name="delete_now">正在Google日历中删除,请稍等</string>   
+    <string name="wait_for_sync_finish">等待同步完成, 请稍后再删</string>
+    <string name="delete_now">正在Google日历中删除, 请稍等</string>   
     <string name="today">今天</string>   
     <string name="about">关于</string>
     
