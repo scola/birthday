@@ -20,7 +20,8 @@ Opensource library
  * [android-lunar-event](https://github.com/ohjongin/android-lunar-event)
  * [calendar-android-sample](http://samples.google-api-java-client.googlecode.com/hg/calendar-android-sample/instructions.html)
  * [google-api-java-client](https://code.google.com/p/google-api-java-client/)
- * [ Google API Client Library for Java](https://developers.google.com/api-client-library/java/apis/calendar/v3)   
+ * [Google API Client Library for Java](https://developers.google.com/api-client-library/java/apis/calendar/v3)
+ * [Lunar-Solar-Calendar-Converter](https://github.com/isee15/Lunar-Solar-Calendar-Converter)
     
 License
 -----
