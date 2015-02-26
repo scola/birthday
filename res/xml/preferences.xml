@@ -41,6 +41,7 @@
         <io.github.scola.birthday.preferences.SummaryEditTextPerference
             	android:defaultValue="10"
             	android:inputType="number"
+            	android:maxLength="2"
 				android:key="repeat"
 				android:title="@string/title_repeat_preference"
 				android:summary="@string/summary_repeat_preference"
