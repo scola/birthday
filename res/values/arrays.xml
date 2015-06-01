@@ -3,11 +3,9 @@
 	<string-array name="pref_method_default_entries">
 		<item>Email</item>
 		<item>Popup</item>
-		<item>SMS</item>
 	</string-array>
 	<string-array name="pref_method_default_values">
 		<item>Email</item>
 		<item>Popup</item>
-		<item>SMS</item>
 	</string-array>
 </resources>
