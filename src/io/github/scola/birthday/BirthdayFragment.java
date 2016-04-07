@@ -69,8 +69,13 @@ public class BirthdayFragment extends PreferenceFragment
 
         preference.setSummary(mBirthday.getName());
         
+        String dateSummary = mBirthday.getFullDate();
         preference = findPreference(KEY_DATE_PREFERENCE);
-        preference.setSummary(mBirthday.getDate());
+        if (dateSummary.length() == 5) {
+        	preference.setSummary("1990-" + dateSummary);
+        } else {
+        	preference.setSummary(dateSummary);
+        }
         
         preference = findPreference(KEY_LUNAR_PREFERENCE);
         ((CheckBoxPreference)preference).setChecked(mBirthday.getIsLunar());

@@ -1,6 +1,7 @@
 package io.github.scola.birthday;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 import android.content.Context;
@@ -24,6 +25,7 @@ public class BirthdayLab {
 
         try {
         	mBirthdays = mSerializer.loadBirthdays();
+        	Collections.sort(mBirthdays);
         } catch (Exception e) {
         	mBirthdays = new ArrayList<Birthday>();
             Log.e(TAG, "Error loading birthdays: ", e);
@@ -64,6 +66,10 @@ public class BirthdayLab {
     public void deleteBirthday(Birthday c) {
         mBirthdays.remove(c);
         saveBirthdays();
+    }
+    
+    public void sortBirthdayList() {
+    	Collections.sort(mBirthdays);
     }
     
     public boolean saveBirthdays() {

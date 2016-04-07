@@ -19,6 +19,14 @@ public class Util {
 		return date_time;
 	}
 	
+	public static int[] SplitDate(String summary, String sep) {
+		int[] date_time = {0, 0, 0};  
+		date_time[0] = Integer.parseInt(summary.split(sep)[0]);
+		date_time[1] = Integer.parseInt(summary.split(sep)[1]);
+		date_time[2] = Integer.parseInt(summary.split(sep)[2]);
+		return date_time;
+	}
+	
 	public static ArrayList<Birthday> cloneList(ArrayList<Birthday> list) {
 		ArrayList<Birthday> clone = new ArrayList<Birthday>();
 		if(list == null || list.size() == 0) return null;
@@ -107,6 +115,29 @@ public class Util {
 		cal.set(currentCalendar.get(Calendar.YEAR), currentCalendar.get(Calendar.MONTH), currentCalendar.get(Calendar.DAY_OF_MONTH));
 		long todayTime = cal.getTimeInMillis();
 		return (birthdayTime - todayTime)/ (24 * 3600 * 1000);
+	}
+	
+	public static int getAge(String date, Boolean isLunar) {
+		int[] birthday = SplitDate(date, "-");
+		int year = birthday[0];
+		Date birthDate;
+		Calendar cal = Calendar.getInstance();
+		if(isLunar) {
+			Log.d(TAG, "date " + date);
+			birthDate = getFirstLunarDate(date.substring(5), "12:00", 1).get(0);			
+			cal.setTime(birthDate);
+			Solar solar_birthday = new Solar();
+			solar_birthday.solarYear = cal.get(Calendar.YEAR);
+			solar_birthday.solarMonth = cal.get(Calendar.MONTH)+ 1;
+			solar_birthday.solarDay = cal.get(Calendar.DAY_OF_MONTH);
+			Log.d(TAG, "solar_birthday.solarYear " + solar_birthday.solarYear + " solar_birthday.solarMonth " + solar_birthday.solarMonth + " solar_birthday.solarDay " + solar_birthday.solarDay);
+			Lunar lunar = LunarSolarConverter.SolarToLunar(solar_birthday);
+			return lunar.lunarYear - year;
+		} else {
+			birthDate = getFirstDate(date.substring(5), "12:00");
+			cal.setTime(birthDate);
+			return cal.get(Calendar.YEAR) - year;
+		}
 	}
 	
 	public static int compareDate(Solar solar, Solar today) {

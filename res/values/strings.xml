@@ -53,7 +53,8 @@
     <string name="event_summary">\'s Birthday</string>
     
     <string name="tomorrow">Tomorrow is&#160;</string>
-    <string name="days_left">&#160;days left</string>
+    <string name="days_left">&#160;days before</string>
+    <string name="age">&#160;%d years</string>
     
     <string name="confirm_for_delete">Delete the birthday</string>
     <string name="delete_alert_msg">After delete the birthday on google calendar, the birthday will be deleted.Are you sure to delete</string>

@@ -401,7 +401,7 @@ public class BirthdayListFragment extends ListFragment {
 	          	Log.d(TAG, "birthday " + i + " changed");
 	          	mBirthdays.get(i).setIsSync(false);
             }
-
+            BirthdayLab.get(getActivity()).sortBirthdayList();
          break;
       }
     }
@@ -556,9 +556,16 @@ public class BirthdayListFragment extends ListFragment {
             String dayLeftString = dayLeft + getStringFromRes(R.string.days_left);
             if(dayLeft == 0) {
             	dayLeftString = getStringFromRes(R.string.today);
-            }            
-
-            dayLeftTextView.setText(dayLeftString);            
+            }
+            
+            if (c.getFullDate().length() > 5) {
+            	int age =Util.getAge(c.getFullDate(), c.getIsLunar());
+            	String ageText = String.format(getStringFromRes(R.string.age), age);
+            	dayLeftTextView.setText(dayLeftString + ageText);      
+            } else {
+            	dayLeftTextView.setText(dayLeftString);
+            }
+                   
             dateTextView.setText((c.getIsLunar() ? getResources().getString(R.string.lunar) : getResources().getString(R.string.solar)) + " " + c.getDate());
 
             return convertView;

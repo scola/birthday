@@ -1,5 +1,7 @@
 package io.github.scola.birthday;
 
+import io.github.scola.birthday.utils.Util;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Birthday {
+public class Birthday implements Comparable<Birthday>{
 	
     private static final String JSON_ID = "id";
     private static final String JSON_NAME = "name";
@@ -104,6 +106,10 @@ public class Birthday {
 	}
 
 	public String getDate() {
+		return mDate.length() > 5 ? mDate.substring(5) : mDate;
+	}
+	
+	public String getFullDate() {
 		return mDate;
 	}
 
@@ -175,7 +181,7 @@ public class Birthday {
 	public boolean equals(Object o) {
 		Birthday birthday = (Birthday)o;
 		return birthday.mName.equals(mName) &&
-			   birthday.mDate.equals(mDate) &&
+			   birthday.getDate().equals(getDate()) &&
 			   birthday.mTime.equals(mTime) &&
 			   birthday.isLunar.equals(isLunar) &&
 			   birthday.isEarly.equals(isEarly) &&
@@ -193,5 +199,11 @@ public class Birthday {
 			   mRepeat + " " +
 			   mMethod + " " + 
 			   "isSync " + isSync;
+	}
+	
+//	@Override
+	public int compareTo(Birthday birthday) {
+		//write code here for compare name
+		return (int)(Util.getDayLeft(this.getDate(), this.getIsLunar()) - Util.getDayLeft(birthday.getDate(), birthday.getIsLunar()));
 	}
 }

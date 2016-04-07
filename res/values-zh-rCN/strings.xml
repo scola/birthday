@@ -54,6 +54,7 @@
     
     <string name="tomorrow">明天是&#160;</string>
     <string name="days_left">&#160;天后</string>
+    <string name="age">&#160;%d 岁</string>
     
     <string name="confirm_for_delete">删除生日</string>
     <string name="delete_alert_msg">在Google日历中删除之后, 选中的生日才会删除, 确定要删除么</string>
