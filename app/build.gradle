@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion '24.0.2'
+    defaultConfig {
+        applicationId "io.github.scola.birthday"
+        minSdkVersion 19
+        targetSdkVersion 22
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:support-v13:24.2.1'
+    compile 'com.google.android.gms:play-services:9.8.0'
+    compile('com.google.http-client:google-http-client-gson:1.22.0') {
+        exclude module: 'httpclient'
+    }
+    compile('com.google.api-client:google-api-client-android:1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.apis:google-api-services-calendar:v3-rev225-1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+}
