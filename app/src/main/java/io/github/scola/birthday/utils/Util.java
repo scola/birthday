@@ -116,6 +116,19 @@ public class Util {
 		long todayTime = cal.getTimeInMillis();
 		return (birthdayTime - todayTime)/ (24 * 3600 * 1000);
 	}
+
+	public static int getWeekday(String date, Boolean isLunar) {
+		Date birthDate;
+		if(isLunar) {
+			birthDate = getFirstLunarDate(date, "12:00", 1).get(0);
+		} else {
+			birthDate = getFirstDate(date, "12:00");
+		}
+		Calendar cal = Calendar.getInstance();
+		Calendar currentCalendar = Calendar.getInstance();
+		cal.setTime(birthDate);
+		return cal.get(Calendar.DAY_OF_WEEK);
+	}
 	
 	public static int getAge(String date, Boolean isLunar) {
 		int[] birthday = SplitDate(date, "-");

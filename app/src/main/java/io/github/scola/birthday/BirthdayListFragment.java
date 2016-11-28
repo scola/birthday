@@ -126,7 +126,7 @@ public class BirthdayListFragment extends ListFragment {
     	if (checkGooglePlayServicesAvailable()) {
     	      haveGooglePlayServices();
     	}
-    	
+        BirthdayLab.get(getActivity()).sortBirthdayList();
     	((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
     	for(int i = 0; i < mBirthdays.size(); i++) {
         	if(calendarId == null || mBirthdays.get(i).getIsSync() || mBirthdays.get(i).getName().equals(getResources().getString(R.string.summary_name_preference)) ||
@@ -401,7 +401,7 @@ public class BirthdayListFragment extends ListFragment {
 	          	Log.d(TAG, "birthday " + i + " changed");
 	          	mBirthdays.get(i).setIsSync(false);
             }
-            BirthdayLab.get(getActivity()).sortBirthdayList();
+
          break;
       }
     }
@@ -565,8 +565,9 @@ public class BirthdayListFragment extends ListFragment {
             } else {
             	dayLeftTextView.setText(dayLeftString);
             }
-                   
-            dateTextView.setText((c.getIsLunar() ? getResources().getString(R.string.lunar) : getResources().getString(R.string.solar)) + " " + c.getDate());
+
+            String[] weekday = getResources().getStringArray(R.array.week_day_values);
+            dateTextView.setText((c.getIsLunar() ? getResources().getString(R.string.lunar) : getResources().getString(R.string.solar)) + " " + c.getDate() + " " + weekday[Util.getWeekday(c.getDate(), c.getIsLunar()) - 1]);
 
             return convertView;
         }

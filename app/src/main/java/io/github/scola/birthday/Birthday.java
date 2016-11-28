@@ -41,7 +41,7 @@ public class Birthday implements Comparable<Birthday>{
         isLunar = true;
         isEarly = false;
         mRepeat = 10;
-        mMethod = "Email";
+        mMethod = "Popup";
         mEventId = new ArrayList<String>();
         isSync = false;
     }

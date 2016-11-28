@@ -249,7 +249,6 @@ public class BirthdayFragment extends PreferenceFragment
         });
         new AlertDialog.Builder(getActivity())
                 .setTitle(String.format(_(R.string.about_info_title), getMyVersion(getActivity())))
-                .setCancelable(false)
                 .setPositiveButton(R.string.about_info_share, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialogInterface, int i) {

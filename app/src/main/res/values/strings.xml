@@ -78,5 +78,13 @@
     <string name="share_subject">Invite to use Birthday app for google calendar</string>
     <string name="share_channel">Share via</string>
     <string name="about_info_close">Close</string>
+
+    <string name="sunday">Sun</string>
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
     
 </resources>
