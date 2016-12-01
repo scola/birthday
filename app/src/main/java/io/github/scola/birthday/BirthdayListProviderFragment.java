@@ -13,10 +13,12 @@ import java.util.TimeZone;
 import io.github.scola.birthday.R;
 import io.github.scola.birthday.utils.Util;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -24,14 +26,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,9 +54,10 @@ import android.view.ActionMode;
 import android.widget.AbsListView.MultiChoiceModeListener;
 
 public class BirthdayListProviderFragment extends ListFragment {
-    private static final String MY_ACCOUNT_NAME = "Lunar Birthday";
+    private static final String MY_CALENDAR_NAME = "Lunar Birthday";
     private static final String PREF_CALENDAR_ID = "calenderId";
-    private String mTimeZone;
+    public static final String PREF_GOOGLE_LOGIN = "googleLogin";
+    private static final String GOOGLE_CALENDAR_TYPE = "com.google";
 
     public static final String TAG = "ProviderFragment";
 
@@ -62,6 +68,7 @@ public class BirthdayListProviderFragment extends ListFragment {
     public static final int REQUEST_NEW_BIRTHDAY = 3;
 
     private long localCalendarId = -1;
+    private boolean mGoogleLogin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,10 +83,8 @@ public class BirthdayListProviderFragment extends ListFragment {
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
         localCalendarId = settings.getLong(PREF_CALENDAR_ID, -1);
-
-        if (localCalendarId == -1) {
-            loadLocalCalendarAndCreate();
-        }
+        final SharedPreferences sharedPref = getActivity().getSharedPreferences(PREF_GOOGLE_LOGIN, Context.MODE_PRIVATE);
+        mGoogleLogin = sharedPref.getBoolean(PREF_GOOGLE_LOGIN, false);
     }
 
     @Override
@@ -87,7 +92,11 @@ public class BirthdayListProviderFragment extends ListFragment {
         super.onResume();
         Log.d(TAG, "onResume");
         Log.d(TAG, "system timeZone: " + TimeZone.getDefault().getID());
-        listAllCalendar();
+        if (isCalendarPermissionGranted(1)) {
+            if (localCalendarId == -1) {
+                listAllCalendar();
+            }
+        }
 
         BirthdayLab.get(getActivity()).sortBirthdayList();
         ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
@@ -100,31 +109,36 @@ public class BirthdayListProviderFragment extends ListFragment {
             if(mBirthdays.get(i).getEventId() != null && mBirthdays.get(i).getEventId().size() > 0) {
                 //update
                 Log.d(TAG, "Start to update " + ": " + mBirthdays.get(i));
+                deleteEvent(mBirthdays.get(i));
                 if(mBirthdays.get(i).getIsLunar() == false) {
-                    if(mBirthdays.get(i).getEventId().size() == 1){
-                        //just update
-                        createEvent(mBirthdays.get(i), true);
-                    } else {
-                        //remove event
-                        Log.d(TAG, "Start to delete the exist event and update " + i + ": " + mBirthdays.get(i));
-                        deleteEvent(mBirthdays.get(i));
-                        createEvent(mBirthdays.get(i), false);
-                    }
+//                    deleteEvent(mBirthdays.get(i));
+                    createEvent(mBirthdays.get(i), false);
+//                    if(mBirthdays.get(i).getEventId().size() == 1){
+//                        //just update
+//                        createEvent(mBirthdays.get(i), true);
+//                    } else {
+//                        //remove event
+//                        Log.d(TAG, "Start to delete the exist event and update " + i + ": " + mBirthdays.get(i));
+//                        deleteEvent(mBirthdays.get(i));
+//                        createEvent(mBirthdays.get(i), false);
+//                    }
                 } else {
-                    if(mBirthdays.get(i).getEventId().size() == mBirthdays.get(i).getRepeat()) {
-                        //just update
-                        createLunarEvent(mBirthdays.get(i), true);
-                    } else {
-                        //remove event
-                        Log.d(TAG, "Start to delete the exist event and update " + i + ": " + mBirthdays.get(i));
-                        deleteEvent(mBirthdays.get(i));
-                        createLunarEvent(mBirthdays.get(i), false);
-
-                    }
+//                    deleteEvent(mBirthdays.get(i));
+                    asyncCreateLunarEvent(mBirthdays.get(i));
+//                    if(mBirthdays.get(i).getEventId().size() == mBirthdays.get(i).getRepeat()) {
+//                        //just update
+//                        createLunarEvent(mBirthdays.get(i), true);
+//                    } else {
+//                        //remove event
+//                        Log.d(TAG, "Start to delete the exist event and update " + i + ": " + mBirthdays.get(i));
+//                        deleteEvent(mBirthdays.get(i));
+//                        createLunarEvent(mBirthdays.get(i), false);
+//
+//                    }
                 }
             } else {
                 if(mBirthdays.get(i).getIsLunar()) {
-                    createLunarEvent(mBirthdays.get(i), false);
+                    asyncCreateLunarEvent(mBirthdays.get(i));
                 } else {
                     createEvent(mBirthdays.get(i), false);
                 }
@@ -132,11 +146,12 @@ public class BirthdayListProviderFragment extends ListFragment {
         }
     }
 
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        Log.d(TAG, "onStop()");;
-//    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop()");
+        BirthdayLab.get(getActivity()).saveBirthdays();
+    }
 
 //    @Override
 //    public void onDetach() {
@@ -159,86 +174,126 @@ public class BirthdayListProviderFragment extends ListFragment {
                                 Calendars.VISIBLE + " = 1",
                                 null,
                                 Calendars._ID + " ASC");
+        boolean first = true;
         if (calCursor.moveToFirst()) {
             do {
                 long id = calCursor.getLong(0);
                 String displayName = calCursor.getString(1);
-                Log.d(TAG, "find calendar: " + displayName);
+                Log.d(TAG, "find calendar id: " + id + " Calendars.NAME: " + calCursor.getString(1) + " Calendars.ACCOUNT_NAME:" + calCursor.getString(2) + " Calendars.ACCOUNT_TYPE:" + calCursor.getString(3));
+                if (first) {
+                    first = false;
+                    localCalendarId = calCursor.getLong(0);
+                }
+                if (calCursor.getString(3).equals(GOOGLE_CALENDAR_TYPE)) {
+//                    mGoogleAccount = calCursor.getString(2);
+                    mGoogleLogin = true;
+                    localCalendarId = calCursor.getLong(0);
+                    Log.d(TAG, "mGoogleLogin = true, " + "localCalendarId:" + localCalendarId);
+                    break;
+                }
                 // …
             } while (calCursor.moveToNext());
         }
         calCursor.close();
-    }
-
-    private void loadLocalCalendarAndCreate() {
-        long calId = getCalendarId();
-        if (calId == -1) {
-            Log.d(TAG, "have not create calendar and create now");
-            ContentValues values = new ContentValues();
-            values.put(
-                    Calendars.ACCOUNT_NAME,
-                    MY_ACCOUNT_NAME);
-            values.put(
-                    Calendars.ACCOUNT_TYPE,
-                    CalendarContract.ACCOUNT_TYPE_LOCAL);
-            values.put(
-                    Calendars.NAME,
-                    MY_ACCOUNT_NAME);
-            values.put(
-                    Calendars.CALENDAR_DISPLAY_NAME,
-                    MY_ACCOUNT_NAME);
-            values.put(
-                    Calendars.CALENDAR_COLOR,
-                    0xffff0000);
-            values.put(
-                    Calendars.CALENDAR_ACCESS_LEVEL,
-                    Calendars.CAL_ACCESS_OWNER);
-            values.put(
-                    Calendars.CALENDAR_TIME_ZONE,
-                    TimeZone.getDefault().getID());
-            values.put(
-                    Calendars.SYNC_EVENTS,
-                    1);
-            values.put(
-                    Calendars.VISIBLE,
-                    1);
-            Uri.Builder builder =
-                    Calendars.CONTENT_URI.buildUpon();
-            builder.appendQueryParameter(
-                    Calendars.ACCOUNT_NAME,
-                    MY_ACCOUNT_NAME);
-            builder.appendQueryParameter(
-                    Calendars.ACCOUNT_TYPE,
-                    CalendarContract.ACCOUNT_TYPE_LOCAL);
-            builder.appendQueryParameter(
-                    CalendarContract.CALLER_IS_SYNCADAPTER,
-                    "true");
-            Uri uri =
-                    getActivity().getContentResolver().insert(builder.build(), values);
-            localCalendarId = new Long(uri.getLastPathSegment());
-        } else {
-            Log.d(TAG, "calendar have created");
-            localCalendarId = calId;
-        }
-
+        Log.d(TAG, "calendar id: " + localCalendarId);
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong(PREF_CALENDAR_ID, localCalendarId);
+//        editor.putBoolean(PREF_GOOGLE_LOGIN, mGoogleLogin);
         editor.commit();
+
+        final SharedPreferences sharedPref = getActivity().getSharedPreferences(PREF_GOOGLE_LOGIN, Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedEditor = sharedPref.edit();
+        sharedEditor.putBoolean(PREF_GOOGLE_LOGIN, mGoogleLogin);
+        sharedEditor.commit();
     }
+
+//    private void loadLocalCalendarAndCreate() {
+//        long calId = getCalendarId();
+//        if (calId == -1) {
+//            Log.d(TAG, "have not create calendar and create now");
+//            ContentValues values = new ContentValues();
+//            Uri.Builder builder =
+//                    Calendars.CONTENT_URI.buildUpon();
+//            if (isGoogleAccountLogin) {
+//                values.put(
+//                        Calendars.ACCOUNT_NAME,
+//                        mGoogleAccount);
+//                values.put(
+//                        Calendars.ACCOUNT_TYPE,
+//                        GOOGLE_CALENDAR_TYPE);
+//                builder.appendQueryParameter(
+//                        Calendars.ACCOUNT_NAME,
+//                        mGoogleAccount);
+//                builder.appendQueryParameter(
+//                        Calendars.ACCOUNT_TYPE,
+//                        GOOGLE_CALENDAR_TYPE);
+//            } else {
+//                values.put(
+//                        Calendars.ACCOUNT_NAME,
+//                        MY_CALENDAR_NAME);
+//                values.put(
+//                        Calendars.ACCOUNT_TYPE,
+//                        CalendarContract.ACCOUNT_TYPE_LOCAL);
+//                builder.appendQueryParameter(
+//                        Calendars.ACCOUNT_NAME,
+//                        MY_CALENDAR_NAME);
+//                builder.appendQueryParameter(
+//                        Calendars.ACCOUNT_TYPE,
+//                        CalendarContract.ACCOUNT_TYPE_LOCAL);
+//            }
+//            values.put(
+//                    Calendars.NAME,
+//                    MY_CALENDAR_NAME);
+//            values.put(
+//                    Calendars.CALENDAR_DISPLAY_NAME,
+//                    MY_CALENDAR_NAME);
+//            values.put(
+//                    Calendars.CALENDAR_COLOR,
+//                    0xffff0000);
+//            values.put(
+//                    Calendars.CALENDAR_ACCESS_LEVEL,
+//                    Calendars.CAL_ACCESS_OWNER);
+//            values.put(
+//                    Calendars.CALENDAR_TIME_ZONE,
+//                    TimeZone.getDefault().getID());
+//            values.put(
+//                    Calendars.SYNC_EVENTS,
+//                    1);
+//            values.put(
+//                    Calendars.VISIBLE,
+//                    1);
+//
+//            builder.appendQueryParameter(
+//                    CalendarContract.CALLER_IS_SYNCADAPTER,
+//                    "true");
+//            Uri uri =
+//                    getActivity().getContentResolver().insert(builder.build(), values);
+//            localCalendarId = new Long(uri.getLastPathSegment());
+//        } else {
+//            Log.d(TAG, "calendar have created");
+//            localCalendarId = calId;
+//        }
+//
+//        Log.d(TAG, "calendar id: " + localCalendarId);
+//        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = settings.edit();
+//        editor.putLong(PREF_CALENDAR_ID, localCalendarId);
+//        editor.commit();
+//    }
 
     private long getCalendarId() {
         String[] projection = new String[]{Calendars._ID};
         String selection =
-                Calendars.ACCOUNT_NAME +
+                Calendars.NAME +
                         " = ? AND " +
-                        Calendars.ACCOUNT_TYPE +
+                Calendars.ACCOUNT_TYPE +
                         " = ? ";
         // use the same values as above:
         String[] selArgs =
                 new String[]{
-                        MY_ACCOUNT_NAME,
-                        CalendarContract.ACCOUNT_TYPE_LOCAL};
+                        MY_CALENDAR_NAME,
+                        GOOGLE_CALENDAR_TYPE};
         Cursor cursor =
                 getActivity().getContentResolver().
                         query(
@@ -340,20 +395,7 @@ public class BirthdayListProviderFragment extends ListFragment {
                     //            @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if(mDeleteBirthdays == null || mDeleteBirthdays.size() == 0) return;
-                        for(Iterator<Birthday> it = mDeleteBirthdays.iterator(); it.hasNext(); ) {
-                            Birthday birthday = it.next();
-                            if(localCalendarId != -1 && birthday.getEventId().size() > 0) {
-//                                new AsyncBatchDeleteEvent(BirthdayListProviderFragment.this, calendarId, birthday, false).execute();
-                                deleteEvent(birthday);
-//                                Toast.makeText(getActivity(), getStringFromRes(R.string.delete_now),
-//                                        Toast.LENGTH_LONG).show();
-                            }
-                            BirthdayLab.get(getActivity()).deleteBirthday(birthday);
-                            it.remove();
-                            ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
-
-                        }
-
+                        asyncDeleteEvent();
                     }
 
                 })
@@ -458,6 +500,7 @@ public class BirthdayListProviderFragment extends ListFragment {
                                     values,
                                     CalendarContract.Events._ID + " =? ",
                                     selArgs);
+            setRemind(values, new Long(selArgs[0]), birthday.getMethod(), birthday.getIsEarly(), update);
         } else {
 //            new AsyncInsertEvent(this, calendarId, event, birthday).execute();
             values.put(CalendarContract.Events.CALENDAR_ID, localCalendarId);
@@ -466,15 +509,66 @@ public class BirthdayListProviderFragment extends ListFragment {
 
             long eventId = new Long(uri.getLastPathSegment());
 
-            setRemind(values,eventId, birthday.getMethod(), birthday.getIsEarly());
+            setRemind(values,eventId, birthday.getMethod(), birthday.getIsEarly(), update);
             birthday.getEventId().add(String.valueOf(eventId));
         }
+        birthday.setIsSync(true);
+    }
+
+    private void asyncDeleteEvent() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground( Void... voids ) {
+                for(Iterator<Birthday> it = mDeleteBirthdays.iterator(); it.hasNext(); ) {
+                    Birthday birthday = it.next();
+                    if(localCalendarId != -1 && birthday.getEventId().size() > 0) {
+                        deleteEvent(birthday);
+                    }
+                    BirthdayLab.get(getActivity()).deleteBirthday(birthday);
+                    it.remove();
+                }
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void post) {
+                super.onPostExecute(post);
+                getActivity().setProgressBarIndeterminateVisibility(false);
+                ((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
+            }
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                getActivity().setProgressBarIndeterminateVisibility(true);
+            }
+        }.execute();
+    }
+
+    private void asyncCreateLunarEvent(final Birthday birthday) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground( Void... voids ) {
+                createLunarEvent(birthday, false);
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void post) {
+                super.onPostExecute(post);
+                getActivity().setProgressBarIndeterminateVisibility(false);
+            }
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                getActivity().setProgressBarIndeterminateVisibility(true);
+            }
+        }.execute();
     }
 
     public void createLunarEvent(Birthday birthday, Boolean update) {
         Log.d(TAG, "createLunarEvent update " + update);
         List<Date> startDate = Util.getFirstLunarDate(birthday.getDate(), birthday.getTime(), birthday.getRepeat());
         int i = 0;
+        ArrayList<ContentProviderOperation> ops =
+                new ArrayList<ContentProviderOperation>();
         for(Date date : startDate) {
             ContentValues values = new ContentValues();
             setSummary(values, birthday.getName(), birthday.getIsEarly());
@@ -482,25 +576,75 @@ public class BirthdayListProviderFragment extends ListFragment {
             if(update) {
                 String[] selArgs =
                         new String[]{birthday.getEventId().get(i)};
-                int updated =
-                        getActivity().getContentResolver().
-                                update(
-                                        CalendarContract.Events.CONTENT_URI,
-                                        values,
-                                        CalendarContract.Events._ID + " =? ",
-                                        selArgs);
+//                int updated =
+//                        getActivity().getContentResolver().
+//                                update(
+//                                        CalendarContract.Events.CONTENT_URI,
+//                                        values,
+//                                        CalendarContract.Events._ID + " =? ",
+//                                        selArgs);
+
+                ops.add(
+                        ContentProviderOperation.newUpdate(Events.CONTENT_URI)
+                                .withValues(values)
+                                .withSelection(Events._ID + "=?", selArgs)
+                                .build());
             } else {
                 values.put(CalendarContract.Events.CALENDAR_ID, localCalendarId);
-                Uri uri = getActivity().getContentResolver().
-                        insert(CalendarContract.Events.CONTENT_URI, values);
+//                Uri uri = getActivity().getContentResolver().
+//                        insert(CalendarContract.Events.CONTENT_URI, values);
 
-                long eventId = new Long(uri.getLastPathSegment());
+                ops.add(
+                        ContentProviderOperation.newInsert(Events.CONTENT_URI)
+                                .withValues(values)
+                                .build());
 
-                setRemind(values,eventId, birthday.getMethod(), birthday.getIsEarly());
-                birthday.getEventId().add(String.valueOf(eventId));
+//                long eventId = new Long(uri.getLastPathSegment());
+
+//                setRemind(values,eventId, birthday.getMethod(), birthday.getIsEarly());
+//                birthday.getEventId().add(String.valueOf(eventId));
             }
             i++;
         }
+        ContentProviderResult[] lunarEvent = null;
+        try {
+            lunarEvent = getActivity().getContentResolver().
+                    applyBatch(CalendarContract.AUTHORITY, ops);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (OperationApplicationException e) {
+            // do s.th.
+            e.printStackTrace();
+        }
+        ops.clear();
+
+        if (lunarEvent != null) {
+            if (update) {
+                for (i = 0; i < birthday.getEventId().size(); i++) {
+                    ContentValues values = new ContentValues();
+                    ops.addAll(setLunarRemind(values, new Long(birthday.getEventId().get(i)), birthday.getMethod(), birthday.getIsEarly(), update));
+                }
+            } else {
+                for (ContentProviderResult event : lunarEvent) {
+                    ContentValues values = new ContentValues();
+                    long eventId = new Long(event.uri.getLastPathSegment());
+                    birthday.getEventId().add(String.valueOf(eventId));
+                    ops.addAll(setLunarRemind(values, eventId, birthday.getMethod(), birthday.getIsEarly(), update));
+                }
+            }
+
+            try {
+                getActivity().getContentResolver().
+                        applyBatch(CalendarContract.AUTHORITY, ops);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            } catch (OperationApplicationException e) {
+                // do s.th.
+                e.printStackTrace();
+            }
+        }
+        birthday.setIsSync(true);
+        Log.d(TAG, "createLunarEvent update " + update + " finish");
     }
 
     private void setSummary(ContentValues values, String name, Boolean isEarly) {
@@ -524,17 +668,71 @@ public class BirthdayListProviderFragment extends ListFragment {
         values.put(CalendarContract.Events.DTEND, startDate.getTime() + 3600000);
     }
 
-    private void setRemind(ContentValues values, long eventId, String remindMethod, Boolean isEarly) {
-        values.clear();
-        values.put(CalendarContract.Reminders.EVENT_ID, eventId);
-        values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+    private void setRemind(ContentValues values, long eventId, String remindMethod, Boolean isEarly, Boolean update) {
+        String[] method = remindMethod.toLowerCase().split(",");
+        for(int i = 0; i < method.length; i++) {
+            Log.d(TAG, "getMethod " + method[i]);
+            values.clear();
 
-        if(isEarly) {
-            values.put(CalendarContract.Reminders.MINUTES, 60 * 24);
-        } else {
-            values.put(CalendarContract.Reminders.MINUTES, 10);
+            if (method[i].trim().equals("popup")) {
+                values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+            } else {
+                values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_EMAIL);
+            }
+
+            if(isEarly) {
+                values.put(CalendarContract.Reminders.MINUTES, 60 * 24);
+            } else {
+                values.put(CalendarContract.Reminders.MINUTES, 10);
+            }
+            if (update) {
+                getActivity().getContentResolver().
+                        update(
+                                CalendarContract.Reminders.CONTENT_URI,
+                                values,
+                                CalendarContract.Reminders._ID + " =? ",
+                                new String[]{String.valueOf(eventId)});
+            } else {
+                values.put(CalendarContract.Reminders.EVENT_ID, eventId);
+                getActivity().getContentResolver().insert(CalendarContract.Reminders.CONTENT_URI, values);
+            }
         }
-        getActivity().getContentResolver().insert(CalendarContract.Reminders.CONTENT_URI, values);
+    }
+
+    private ArrayList<ContentProviderOperation> setLunarRemind(ContentValues values, long eventId, String remindMethod, Boolean isEarly, Boolean update) {
+        ArrayList<ContentProviderOperation> ops =
+                new ArrayList<ContentProviderOperation>();
+        String[] method = remindMethod.toLowerCase().split(",");
+        for(int i = 0; i < method.length; i++) {
+            Log.d(TAG, "getMethod " + method[i]);
+            values.clear();
+            values.put(CalendarContract.Reminders.EVENT_ID, eventId);
+
+            if (method[i].trim().equals("popup")) {
+                values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+            } else {
+                values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_EMAIL);
+            }
+
+            if(isEarly) {
+                values.put(CalendarContract.Reminders.MINUTES, 60 * 24);
+            } else {
+                values.put(CalendarContract.Reminders.MINUTES, 10);
+            }
+
+            if (update) {
+                ops.add(
+                        ContentProviderOperation.newUpdate(CalendarContract.Reminders.CONTENT_URI)
+                                .withValues(values)
+                                .build());
+            } else {
+                ops.add(
+                        ContentProviderOperation.newInsert(CalendarContract.Reminders.CONTENT_URI)
+                                .withValues(values)
+                                .build());
+            }
+        }
+        return ops;
     }
 
     private String getStringFromRes(int id) {
@@ -565,6 +763,37 @@ public class BirthdayListProviderFragment extends ListFragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public  boolean isCalendarPermissionGranted(int request) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (getActivity().checkSelfPermission(android.Manifest.permission.WRITE_CALENDAR)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v(TAG,"Permission is granted");
+                return true;
+            } else {
+                Log.v(TAG,"Permission is revoked");
+                requestPermissions(new String[]{Manifest.permission.WRITE_CALENDAR}, request);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG,"Permission is granted");
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            Log.v(TAG,"onRequestPermissionsResult Permission: "+ permissions[0] + "was "+ grantResults[0]);
+            if (localCalendarId == -1) {
+                listAllCalendar();
+            }
+        } else {
+            getActivity().finish();
         }
     }
 

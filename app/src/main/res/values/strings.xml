@@ -32,6 +32,7 @@
     <string name="pref_upload_buckets_image">upload.buckets_image</string>
     
     <string name="email">Email</string>
+    <string name="popup">Popup</string>
     
     <string name="inline_preferences">Happy birthday</string>
     

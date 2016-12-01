@@ -56,4 +56,12 @@
     <string name="share_subject">邀請你使用農歷生日</string>
     <string name="share_channel">分享通過</string>
     <string name="about_info_close">關閉</string>
+
+    <string name="sunday">週日</string>
+    <string name="monday">週一</string>
+    <string name="tuesday">週二</string>
+    <string name="wednesday">週三</string>
+    <string name="thursday">週四</string>
+    <string name="friday">週五</string>
+    <string name="saturday">週六</string>
 </resources>

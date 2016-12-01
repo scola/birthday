@@ -36,7 +36,7 @@ public class ListPreferenceMultiSelect extends ListPreference {
 	private static final String LOG_TAG = "ListPreferenceMultiSelect";
 	private String checkAllKey = null;
 	private boolean[] mClickedDialogEntryIndices;
-	CharSequence mDefaultSummary;
+	private CharSequence mDefaultSummary;
 	
 	// Constructor
 	public ListPreferenceMultiSelect(Context context, AttributeSet attrs) {

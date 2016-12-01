@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class SummaryEditTextPerference extends EditTextPreference{	
 	
-	private static final String TAG = "SummaryEditTextPerference";
+	private static final String TAG = "EditTextPerference";
 	CharSequence mDefaultSummary;
     public SummaryEditTextPerference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);

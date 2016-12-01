@@ -53,7 +53,7 @@
 			    android:key="method"
 			    android:title="@string/title_method_preference" 
 			    android:dialogTitle="@string/dialog_title_method_preference"
-			    android:summary="@string/email"
+			    android:summary="@string/popup"
 			    android:entries="@array/pref_method_default_entries"
 			    android:entryValues="@array/pref_method_default_values" >
 		</io.github.scola.birthday.preferences.ListPreferenceMultiSelect>

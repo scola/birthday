@@ -91,6 +91,13 @@ public class BirthdayFragment extends PreferenceFragment
         
         preference = findPreference(KEY_METHOD_PREFERENCE);
         preference.setSummary(mBirthday.getMethod());
+
+        final SharedPreferences sharedPref = getActivity().getSharedPreferences(BirthdayListProviderFragment.PREF_GOOGLE_LOGIN, Context.MODE_PRIVATE);
+        boolean googleLogin = sharedPref.getBoolean(BirthdayListProviderFragment.PREF_GOOGLE_LOGIN, true);
+
+        if (googleLogin == false) {
+            preference.setEnabled(false);
+        }
         
         
         setHasOptionsMenu(true);
