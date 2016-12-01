@@ -9,7 +9,7 @@
 
 How to build
 ------------
- ¡Á android studio/gradle
+ * android studio/gradle
  * jdk 1.7+
  * Android SDK 23
  * buildToolsVersion 23.0.2
