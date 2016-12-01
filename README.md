@@ -5,12 +5,14 @@
 
 [![Google Play](http://developer.android.com/images/brand/en_generic_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=io.github.scola.birthday)
 
+[![¿áÊÐ³¡](http://ww2.sinaimg.cn/large/a15b4afegw1f7udy3xmafj203n03naa8.jpg)](http://www.coolapk.com/apk/io.github.scola.birthday)
+
 How to build
 ------------
- * jdk 1.6+
- * ant(optional)
- * Android SDK 17+
- * Google play service
+ ¡Á android studio/gradle
+ * jdk 1.7+
+ * Android SDK 23
+ * buildToolsVersion 23.0.2
 
 Eclipse(packed with android SDK) -> File -> import -> Existing Projects into Workspace.  
 
