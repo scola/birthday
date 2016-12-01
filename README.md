@@ -14,8 +14,6 @@ How to build
  * Android SDK 23
  * buildToolsVersion 23.0.2
 
-Eclipse(packed with android SDK) -> File -> import -> Existing Projects into Workspace.  
-
 Opensource library
 ------------------
  * [icu4j](http://site.icu-project.org/home/why-use-icu4j)
