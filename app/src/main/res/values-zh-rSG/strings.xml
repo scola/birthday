@@ -4,7 +4,7 @@
   <string name="app_name">农历生日</string>
   
     <string name="title_name_preference">称谓</string>
-    <string name="summary_name_preference">谁的生日</string>    
+    <string name="summary_name_preference">谁</string>
     <string name="dialog_title_name_preference">输入称谓</string>    
     <string name="title_remind_time_preference">提醒时间</string>
     <string name="dialog_title_remind_time_preference">设置提醒时间</string>    
@@ -51,6 +51,8 @@
     <string name="description_add">添加日历</string>
     
     <string name="event_summary">生日</string>
+    <string name="event_solar_summary">公歷生日</string>
+    <string name="event_lunar_summary">農歷生日</string>
     
     <string name="tomorrow">明天是&#160;</string>
     <string name="days_left">&#160;天后</string>

@@ -414,7 +414,7 @@ public class BirthdayListFragment extends ListFragment {
     public void createEvent(Birthday birthday, Boolean update) {
     	Log.d(TAG, "createEvent update " + update);
     	Event event = new Event();
-    	setSummary(event, birthday.getName(), birthday.getIsEarly());
+    	setSummary(event, birthday.getName(), birthday.getIsEarly(), birthday.getIsLunar());
     	setRecurrence(event, birthday.getIsLunar(), birthday.getRepeat());
 //    	
     	Date startDate = Util.getFirstDate(birthday.getDate(), birthday.getTime());
@@ -437,7 +437,7 @@ public class BirthdayListFragment extends ListFragment {
     	List<Date> startDate = Util.getFirstLunarDate(birthday.getDate(), birthday.getTime(), birthday.getRepeat());
     	for(Date date : startDate) {
     		Event event = new Event();
-    		setSummary(event, birthday.getName(), birthday.getIsEarly());
+    		setSummary(event, birthday.getName(), birthday.getIsEarly(), birthday.getIsLunar());
         	setRecurrence(event, birthday.getIsLunar(), birthday.getRepeat());
     		setStartEndTime(event, date);
     		setRemind(event, birthday.getMethod(), birthday.getIsEarly());
@@ -453,11 +453,19 @@ public class BirthdayListFragment extends ListFragment {
     		
     }
     
-    private void setSummary(Event event, String name, Boolean isEarly) {
+    private void setSummary(Event event, String name, Boolean isEarly, Boolean isLunar) {
     	if(isEarly) {
-    		event.setSummary(name + getStringFromRes(R.string.event_summary) + "(" + getStringFromRes(R.string.summary_early_checkbox_preference) + ")");
+            if (isLunar) {
+                event.setSummary(name + getStringFromRes(R.string.event_lunar_summary) + "(" + getStringFromRes(R.string.summary_early_checkbox_preference) + ")");
+            } else {
+                event.setSummary(name + getStringFromRes(R.string.event_solar_summary) + "(" + getStringFromRes(R.string.summary_early_checkbox_preference) + ")");
+            }
     	} else {
-    		event.setSummary(name + getStringFromRes(R.string.event_summary));
+            if (isLunar) {
+                event.setSummary(name + getStringFromRes(R.string.event_lunar_summary));
+            } else {
+                event.setSummary(name + getStringFromRes(R.string.event_solar_summary));
+            }
     	}	
     }
     

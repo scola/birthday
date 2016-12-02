@@ -482,7 +482,7 @@ public class BirthdayListProviderFragment extends ListFragment {
         Log.d(TAG, "createEvent update " + update);
         ContentValues values = new ContentValues();
 
-        setSummary(values, birthday.getName(), birthday.getIsEarly());
+        setSummary(values, birthday.getName(), birthday.getIsEarly(), birthday.getIsLunar());
         setRecurrence(values, birthday.getIsLunar(), birthday.getRepeat());
 //
         Date startDate = Util.getFirstDate(birthday.getDate(), birthday.getTime());
@@ -571,7 +571,7 @@ public class BirthdayListProviderFragment extends ListFragment {
                 new ArrayList<ContentProviderOperation>();
         for(Date date : startDate) {
             ContentValues values = new ContentValues();
-            setSummary(values, birthday.getName(), birthday.getIsEarly());
+            setSummary(values, birthday.getName(), birthday.getIsEarly(), birthday.getIsLunar());
             setStartEndTime(values, date);
             if(update) {
                 String[] selArgs =
@@ -647,11 +647,19 @@ public class BirthdayListProviderFragment extends ListFragment {
         Log.d(TAG, "createLunarEvent update " + update + " finish");
     }
 
-    private void setSummary(ContentValues values, String name, Boolean isEarly) {
+    private void setSummary(ContentValues values, String name, Boolean isEarly, Boolean isLunar) {
         if(isEarly) {
-            values.put(CalendarContract.Events.TITLE, name + getStringFromRes(R.string.event_summary) + "(" + getStringFromRes(R.string.summary_early_checkbox_preference) + ")");
+            if (isLunar) {
+                values.put(CalendarContract.Events.TITLE, name + getStringFromRes(R.string.event_lunar_summary) + "(" + getStringFromRes(R.string.summary_early_checkbox_preference) + ")");
+            } else {
+                values.put(CalendarContract.Events.TITLE, name + getStringFromRes(R.string.event_solar_summary) + "(" + getStringFromRes(R.string.summary_early_checkbox_preference) + ")");
+            }
         } else {
-            values.put(CalendarContract.Events.TITLE, name + getStringFromRes(R.string.event_summary));
+            if (isLunar) {
+                values.put(CalendarContract.Events.TITLE, name + getStringFromRes(R.string.event_lunar_summary));
+            } else {
+                values.put(CalendarContract.Events.TITLE, name + getStringFromRes(R.string.event_solar_summary));
+            }
         }
     }
 

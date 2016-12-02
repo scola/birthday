@@ -4,7 +4,7 @@
   <string name="app_name">Birthday</string>
   
     <string name="title_name_preference">Name</string>
-    <string name="summary_name_preference">Whose birthday</string>    
+    <string name="summary_name_preference">Who</string>
     <string name="dialog_title_name_preference">Input the name</string>    
     <string name="title_remind_time_preference">Remind time</string>
     <string name="dialog_title_remind_time_preference">Set remind time</string>    
@@ -52,6 +52,8 @@
     <string name="description_add">Add Calendar</string>
     
     <string name="event_summary">\'s Birthday</string>
+    <string name="event_solar_summary">\'s Solar Birthday</string>
+    <string name="event_lunar_summary">\'s Lunar Birthday</string>
     
     <string name="tomorrow">Tomorrow is&#160;</string>
     <string name="days_left">&#160;days before</string>

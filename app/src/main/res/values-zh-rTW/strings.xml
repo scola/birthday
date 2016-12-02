@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">農歷生日</string>
     <string name="title_name_preference">稱謂</string>
-    <string name="summary_name_preference">誰的生日</string>
+    <string name="summary_name_preference">誰</string>
     <string name="dialog_title_name_preference">輸入稱謂</string>
     <string name="title_remind_time_preference">提醒時間</string>
     <string name="dialog_title_remind_time_preference">設置提醒時間</string>
@@ -34,6 +34,8 @@
     <string name="title_separator_desc">Title separator</string>
     <string name="description_add">添加日歷</string>
     <string name="event_summary">生日</string>
+    <string name="event_solar_summary">公歷生日</string>
+    <string name="event_lunar_summary">農歷生日</string>
     <string name="tomorrow">明天是&#160;</string>
     <string name="days_left">&#160;天後</string>
     <string name="age">&#160;%d 歲</string>
