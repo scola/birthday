@@ -10,7 +10,8 @@ import android.util.Log;
 public class BirthdayLab {
 	
     private static final String TAG = "BirthdayLab";
-    private static final String FILENAME = "birthdays.json";
+    static final String FILENAME = "birthdays.json";
+    static final Object[] sDataLock = new Object[0];
     
     private ArrayList<Birthday> mBirthdays;
     private BirthdayJSONSerializer mSerializer;
@@ -73,13 +74,15 @@ public class BirthdayLab {
     }
     
     public boolean saveBirthdays() {
-        try {
-            mSerializer.saveBirthdays(mBirthdays);
-            Log.d(TAG, "birthdays saved to file");
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "Error saving birthdays: " + e);
-            return false;
+        synchronized (sDataLock) {
+            try {
+                mSerializer.saveBirthdays(mBirthdays);
+                Log.d(TAG, "birthdays saved to file");
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving birthdays: " + e);
+                return false;
+            }
         }
     }
 

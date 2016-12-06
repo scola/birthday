@@ -796,7 +796,7 @@ public class BirthdayListProviderFragment extends ListFragment {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-            Log.v(TAG,"onRequestPermissionsResult Permission: "+ permissions[0] + "was "+ grantResults[0]);
+            Log.v(TAG,"onRequestPermissionsResult Permission: "+ permissions[0] + " was "+ grantResults[0]);
             if (localCalendarId == -1) {
                 listAllCalendar();
             }

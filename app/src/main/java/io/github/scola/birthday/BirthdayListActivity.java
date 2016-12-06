@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Window;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+
 //import com.google.api.services.samples.calendar.android.CalendarModel;
 
 public class BirthdayListActivity extends SingleFragmentActivity {
-    private static final String PREF_ACCOUNT_NAME = "accountName";
+//    private static final String PREF_ACCOUNT_NAME = "accountName";
 //	public static final String TAG = "BirthdayListFragment";
 //	
 //	public static final int REQUEST_AUTHORIZATION = 1;
@@ -20,9 +23,9 @@ public class BirthdayListActivity extends SingleFragmentActivity {
 	
     @Override
     protected Fragment createFragment() {
-        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-        String googleAccount = settings.getString(PREF_ACCOUNT_NAME, null);
-        if (googleAccount == null) {
+//        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+//        String googleAccount = settings.getString(PREF_ACCOUNT_NAME, null);
+        if (!checkGooglePlayServicesAvailable()) {
             return new BirthdayListProviderFragment();
         } else {
             return new BirthdayListFragment();
@@ -39,5 +42,14 @@ public class BirthdayListActivity extends SingleFragmentActivity {
 //        setProgressBarIndeterminateVisibility(true);
         // And when you want to turn it off
 //        setProgressBarIndeterminateVisibility(false);
+    }
+
+    /** Check that Google Play services APK is installed and up to date. */
+    private boolean checkGooglePlayServicesAvailable() {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(this);
+        return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 }

@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.services.samples.calendar.android.AsyncBatchDeleteEvent;
 import com.google.api.services.samples.calendar.android.AsyncBatchInsertEvent;
@@ -19,13 +21,17 @@ import com.google.api.services.samples.calendar.android.CalendarAsyncTask;
 import io.github.scola.birthday.R;
 import io.github.scola.birthday.utils.Util;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.backup.BackupManager;
+import android.app.backup.RestoreObserver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -61,7 +67,7 @@ import com.google.api.services.samples.calendar.android.AsyncInsertCalendar;
 
 public class BirthdayListFragment extends ListFragment {
 	
-	private static final String PREF_ACCOUNT_NAME = "accountName";	
+	static final String PREF_ACCOUNT_NAME = "accountName";
 	private String mGoogleAccount;
 	private String mTimeZone;
 	
@@ -83,8 +89,8 @@ public class BirthdayListFragment extends ListFragment {
 	public boolean mCancelAyncTasks = false;
 	public com.google.api.services.calendar.Calendar client;
 	
-	public final String PREF_GOOGLE_CALENDAR_ID = "calendarId";
-	public final String PREF_GOOGLE_CALENDAR_TIMEZONE = "timeZone";
+	public static final String PREF_GOOGLE_CALENDAR_ID = "calendarId";
+	public static final String PREF_GOOGLE_CALENDAR_TIMEZONE = "timeZone";
 	
 	final HttpTransport transport = AndroidHttp.newCompatibleTransport();
 	
@@ -93,6 +99,7 @@ public class BirthdayListFragment extends ListFragment {
 	GoogleAccountCredential credential;
 	
 	public String calendarId;
+    BackupManager mBackupManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,6 +124,16 @@ public class BirthdayListFragment extends ListFragment {
             .build();
         calendarId = settings.getString(PREF_GOOGLE_CALENDAR_ID, null);
         mAyncTaskList = new ArrayList<CalendarAsyncTask>();
+        mBackupManager = new BackupManager(getActivity());
+
+//        mBackupManager.requestRestore(
+//                new RestoreObserver() {
+//                    public void restoreFinished(int error) {
+//                        /** Done with the restore!  Now draw the new state of our data */
+//                        Log.v(TAG, "Restore finished, error = " + error);
+//                    }
+//                }
+//        );
     }
     
     @Override
@@ -124,7 +141,9 @@ public class BirthdayListFragment extends ListFragment {
     	super.onResume();
     	Log.d(TAG, "onResume");
     	if (checkGooglePlayServicesAvailable()) {
-    	      haveGooglePlayServices();
+            if (isAccountPermissionGranted(1)) {
+                haveGooglePlayServices();
+            }
     	}
         BirthdayLab.get(getActivity()).sortBirthdayList();
     	((BirthdayAdapter)getListAdapter()).notifyDataSetChanged();
@@ -181,6 +200,7 @@ public class BirthdayListFragment extends ListFragment {
     		}
     	}
     	mSyncingBirthdays.clear();
+        mBackupManager.dataChanged();
     }
     
 //    @Override
@@ -209,12 +229,11 @@ public class BirthdayListFragment extends ListFragment {
     
     /** Check that Google Play services APK is installed and up to date. */
     private boolean checkGooglePlayServicesAvailable() {
-      final int connectionStatusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
-      if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
-        showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
-        return false;
-      }
-      return true;
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(getActivity());
+        return connectionStatusCode == ConnectionResult.SUCCESS;
     }
     
     public void createNewCalendar() {
@@ -360,49 +379,56 @@ public class BirthdayListFragment extends ListFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {  
-    	Log.d(TAG, "onActivityResult");
+    	Log.d(TAG, "onActivityResult requestCode: " + requestCode);
         switch (requestCode) {
-        case REQUEST_GOOGLE_PLAY_SERVICES:
-          if (resultCode == Activity.RESULT_OK) {
-            haveGooglePlayServices();
-          } else {
-            checkGooglePlayServicesAvailable();
-          }
-          break;
-        case REQUEST_AUTHORIZATION:
-          if (resultCode == Activity.RESULT_OK) {
-        	  if(calendarId == null && numAsyncTasks == 0) AsyncLoadCalendars.run(this);
-//        	  createNewCalendar();
-          } else {
-            chooseAccount();
-          }
-          break;
-        case REQUEST_ACCOUNT_PICKER:
-          if (resultCode == Activity.RESULT_OK && data != null && data.getExtras() != null) {
-            String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
-            if (accountName != null) {
-              credential.setSelectedAccountName(accountName);
-              SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-              SharedPreferences.Editor editor = settings.edit();
-              editor.putString(PREF_ACCOUNT_NAME, accountName);
-              editor.commit();
-              mGoogleAccount = accountName;
-              if(calendarId == null && numAsyncTasks == 0) AsyncLoadCalendars.run(this);
-//              createNewCalendar();
-            }
-          }
-          break;
-        case REQUEST_NEW_BIRTHDAY:    	    
-            for(int i = 0; i < mBirthdays.size(); i++) {
-	          	if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
-	          		Log.d(TAG, "birthday " + i + " not change " + mBirthdays.get(i));
-	          		continue;          		
-	          	}
-	          	Log.d(TAG, "birthday " + i + " changed");
-	          	mBirthdays.get(i).setIsSync(false);
-            }
+            case REQUEST_GOOGLE_PLAY_SERVICES:
+              if (resultCode == Activity.RESULT_OK) {
+                haveGooglePlayServices();
+              } else {
+                checkGooglePlayServicesAvailable();
+              }
+              break;
+            case REQUEST_AUTHORIZATION:
+              if (resultCode == Activity.RESULT_OK) {
+                  if(calendarId == null && numAsyncTasks == 0) AsyncLoadCalendars.run(this);
+    //        	  createNewCalendar();
+              } else {
+                chooseAccount();
+              }
+              break;
+            case REQUEST_ACCOUNT_PICKER:
+              if (resultCode == Activity.RESULT_OK && data != null && data.getExtras() != null) {
+                String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+                if (accountName != null) {
+                  credential.setSelectedAccountName(accountName);
+                  SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+                  SharedPreferences.Editor editor = settings.edit();
+                  editor.putString(PREF_ACCOUNT_NAME, accountName);
+                  editor.commit();
+                  mGoogleAccount = accountName;
+                  if(calendarId == null && numAsyncTasks == 0) AsyncLoadCalendars.run(this);
+    //              createNewCalendar();
+                }
+              } else {
+                  getActivity().finish();
+              }
+              break;
+            case REQUEST_NEW_BIRTHDAY:
+                if (mSyncedBirthdays == null) {
+                    break;
+                }
+                for(int i = 0; i < mBirthdays.size(); i++) {
+                    if(mSyncedBirthdays != null && i < mSyncedBirthdays.size() && mSyncedBirthdays.get(i).equals(mBirthdays.get(i))) {
+                        Log.d(TAG, "birthday " + i + " not change " + mBirthdays.get(i));
+                        continue;
+                    }
+                    Log.d(TAG, "birthday " + i + " changed");
+                    mBirthdays.get(i).setIsSync(false);
+                }
+                break;
 
-         break;
+            default:
+                break;
       }
     }
     
@@ -625,7 +651,35 @@ public class BirthdayListFragment extends ListFragment {
 
 	public boolean isCancelAyncTasks() {
 		return mCancelAyncTasks;
-	}	
+	}
+
+    public  boolean isAccountPermissionGranted(int request) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (getActivity().checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v(TAG,"Permission is granted");
+                return true;
+            } else {
+                Log.v(TAG,"Permission is revoked");
+                requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, request);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG,"Permission is granted");
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            Log.v(TAG,"onRequestPermissionsResult Permission: "+ permissions[0] + " was "+ grantResults[0]);
+        } else {
+            getActivity().finish();
+        }
+    }
 	
 }
 
